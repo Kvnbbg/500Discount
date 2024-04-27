@@ -9,7 +9,9 @@
 </head>
 <body>
     <header>
-        <img src="assets/pictures/pause.jpg" alt="Pause Image" style="width: 100%;" />
+        <a href="index.html">
+            <img src="assets/pictures/pause.jpg" alt="Pause Image" style="width: 100%;" />
+        </a>
         <h1>Electric Car Mechanism Interface</h1>
     </header>
     <nav>
@@ -17,25 +19,43 @@
             <li><a href="#">Home</a></li>
             <li><a href="settings.html
                 ">Settings</a></li>
-            <li><a href="#">Themes</a></li>
-            <li><a href="#">About</a></li>
+            <li><a href="themes.html">Themes</a></li>
+            <li><a href="https://kvnbbg.fr">About</a></li>
         </ul>
     </nav>
     <main>
-        <section id="car-info">
+        <section id="info">
             <!-- Display car information here -->
+            <p>
+                The Electric Car Mechanism Interface is a web application that allows users to customize the mechanism and user interface of their electric cars. Users can choose from a variety of themes for both the mechanism and user interface, and can also customize the settings of their electric cars.
+            </p>
         </section>
         <section id="user-interface">
             <!-- Display user interface settings here -->
+            <h2>User Interface Settings</h2>
+            <ul>
+                <li>Theme: Light</li>
+                <li>Font Size: Medium</li>
+                <li>Color Scheme: Purple</li>
+            </ul>
+        </section>
+        <section id="mechanism" >
+            <!-- Display mechanism settings here -->
+            <h2>Mechanism Settings</h2>
+            <ul>
+                <li>Theme: Dark</li>
+                <li>Speed: Fast</li>
+                <li>Sound: On</li>
+            </ul>
+        </section>
+        <section class="my-element">
+            <!-- Display my button here -->
+    
+            <a href="settings.html">
+                <img src="assets/pictures/myButton.jpg" id="myButton" alt="My Button Image to Settings.html" style="width: 100%;" />
+            </a>
         </section>
     </main>
-
-
-    <h1 style="text-align: center;">Super App</h1>
-    <img id="myButton" src="assets/pictures/myButton.jpg" onclick="openDiv()" />
-    <div id="myDiv" style="display:none;">
-        <p>Voici un contenu caché !</p>
-    </div>
     <footer>
         <p>&copy; 2024 Electric Car Mechanism Interface</p>
     </footer>
