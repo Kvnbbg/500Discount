@@ -1,13 +1,21 @@
 /* style.css */
+
 body {
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     background-color: #f9f9f9;
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
+    border-color: lightgreen;
+    border-style: dashed;
+    border-width: 5px;
 }
+
 h1 {
     color: lightskyblue;
+    text-align: center;
 }
+
 header {
     background-color: #333;
     color: whitesmoke;
@@ -36,6 +44,11 @@ nav ul li {
 nav ul li a {
     color: #fff;
     text-decoration: none;
+    transition: color 0.3s ease; /* Add smooth transition for link color */
+}
+
+nav ul li a:hover {
+    color: lightgreen; /* Change link color on hover */
 }
 
 .container {
@@ -58,4 +71,70 @@ footer {
     text-align: center;
     padding-top: 20px;
     margin-top: 20px;
+}
+
+#myButton {
+    transition: opacity 0.3s ease; /* Add smooth transition for opacity */
+}
+
+#myButton:hover {
+    opacity: 0.8; /* Reduce opacity on hover */
+    cursor: pointer; /* Change cursor to pointer */
+}
+
+/* CSS for after click effect */
+#myDiv {
+    display: none; /* Hide the content initially */
+    background-color: rgba(0, 0, 0, 0.8); /* Night light overlay */
+    color: white;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999; /* Ensure content is on top */
+    padding: 20px;
+    box-sizing: border-box;
+    text-align: center;
+    overflow-y: auto; /* Enable scrolling if content exceeds viewport */
+}
+
+#myDiv p {
+    margin-top: 50%; /* Push content downwards */
+    transform: translateY(-50%); /* Center content vertically */
+}
+
+#myDiv.open {
+    display: block; /* Display the hidden content */
+    animation: fadeIn 0.5s ease; /* Fade in animation */
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    /* Adjust styles for smaller screens */
+    header {
+        padding: 20px 10px;
+    }
+
+    nav ul li {
+        margin-right: 10px;
+    }
+
+    main {
+        padding: 10px;
+    }
+
+    footer {
+        padding: 10px;
+        padding-top: 10px;
+    }
 }

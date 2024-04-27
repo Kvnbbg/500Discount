@@ -36,3 +36,16 @@ fetch('car-api-url')
 document.getElementById("myButton").addEventListener("click", function() {
     alert("Vous avez cliqué sur le bouton !");
 });
+
+function openDiv() {
+    // Create a new div
+    var newDiv = document.createElement("div");
+
+    // Add some interactive text to the div
+    var newContent = document.createTextNode("Hello, this is some interactive text!");
+    newDiv.appendChild(newContent);
+
+    // Add the new div to the image button
+    var currentDiv = document.getElementById("myButton");
+    document.body.insertBefore(newDiv, currentDiv);
+}
