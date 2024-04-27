@@ -33,7 +33,10 @@ nav ul li {
     margin-right: 5px;
 }
 
-
+nav ul li a {
+    color: #fff;
+    text-decoration: none;
+}
 
 .container {
     display: flex;
@@ -42,14 +45,6 @@ nav ul li {
 
 section {
     flex: 1;
-}
-
-
-
-
-nav ul li a {
-    color: #fff;
-    text-decoration: none;
 }
 
 main {
