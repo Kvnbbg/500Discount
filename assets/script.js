@@ -3,73 +3,109 @@
 // Description: JavaScript file for the interactive car dashboard
 // Link this script to the settings.html file
 
-document.getElementById('left').addEventListener('click', function(event) {
-    // Handle left navigation
-    function left() {
-        var x = document.getElementById("left");
-        x.style.color = "red";
-        // Create a new div
-        var newDiv = document.createElement("div"); // Add some interactive text to the div
-        var newContent = document.createTextNode("💰🎟️🎫🛒💸");
-        newDiv.appendChild(newContent); // Add the new div to the image button
-        var currentDiv = document.getElementById("myButton");
-        document.body.insertBefore(newDiv, currentDiv);
-      }
-});
+function createPopup(emojiContent) {
+    var popup = document.createElement("div");
+    popup.style.position = "fixed";
+    popup.style.width = "200px";
+    popup.style.height = "200px";
+    popup.style.backgroundColor = "#fff";
+    popup.style.border = "1px solid #000";
+    popup.style.top = "50%";
+    popup.style.left = "50%";
+    popup.style.transform = "translate(-50%, -50%)";
+    popup.style.padding = "20px";
+    popup.style.textAlign = "center";
+    popup.style.zIndex = "1000";
 
-document.getElementById('right').addEventListener('click', function(event) {
-    // Handle right navigation
-    function right() {
-        var x = document.getElementById("right");
-        x.style.color = "green";
-        var newDiv = document.createElement("div");
-        var newContent = document.createTextNode("🚗🚕🚙🚌🚎");
-        newDiv.appendChild(newContent);
-        var currentDiv = document.getElementById("myButton");
-        document.body.insertBefore(newDiv, currentDiv);
-      }
-});
+    var text = document.createTextNode(emojiContent);
+    popup.appendChild(text);
 
-document.getElementById('up').addEventListener('click', function(event) {
-    // Handle up navigation
-    function up() {
-        var x = document.getElementById("up");
-        x.style.color = "blue";
-        var newDiv = document.createElement("div");
-        var newContent = document.createTextNode("🚦🚥🚧🛑🚏");
-        newDiv.appendChild(newContent);
-        var currentDiv = document.getElementById("myButton");
-        document.body.insertBefore(newDiv, currentDiv);
-      }
-});
+    document.body.appendChild(popup);
 
-document.getElementById('down').addEventListener('click', function(event) {
-    // Handle down navigation
-    function down() {
-        var x = document.getElementById("down");
-        x.style.color = "yellow";
-        var newDiv = document.createElement("div");
-        var newContent = document.createTextNode("🚓🚔🚒🚑🚐");
-        newDiv.appendChild(newContent);
-        var currentDiv = document.getElementById("myButton");
-        document.body.insertBefore(newDiv, currentDiv);
-      }
-});
+    // Add attention-seeking animation
+    anime({
+        targets: popup,
+        scale: [0.1, 1.0],
+        duration: 1000,
+        easing: 'easeInOutQuad',
+        complete: function(anim) {
+            setTimeout(function() {
+                popup.remove();
+            }, 1000);
+        }
+    });
+}
 
+// Add event listeners to the navigation buttons
+['left', 'right', 'up', 'down'].forEach(function(direction) {
+    document.getElementById(direction).addEventListener('click', function(event) {
+        createPopup(faker.random.arrayElement(["💰🎟️🎫🛒💸", "🚗🚕🚙🚌🚎", "🚦🚥🚧🛑🚏", "🚓🚔🚒🚑🚐"]));
+    });
+});
 
 // Description: Fetch car information from API and update #car-info section
 // Link this script to the settings.html file
 const carInfoSection = document.getElementById('car-info');
-fetch('car-api-url')
-    .then(response => response.json())
-    .then(data => {
-        // Update car information section
-        carInfoSection.innerHTML = `
-            <h2>Car Information</h2>
-            <p>Model: ${data.model}</p>
-            <p>Year: ${data.year}</p>
-            <p>Battery Health: ${data.batteryHealth}</p>
-        `;
-    })
-    .catch(error => console.error('Error fetching car information:', error));
+
+// Ask the user for a car model
+var userInput = prompt("Please enter a car model, or leave blank to use a public customized car:");
+
+// Simulate loading bar
+var loadingBar = document.createElement("div");
+loadingBar.style.position = "fixed";
+loadingBar.style.top = "0";
+loadingBar.style.left = "0";
+loadingBar.style.height = "4px";
+loadingBar.style.width = "0";
+loadingBar.style.backgroundColor = "#007bff";
+loadingBar.style.transition = "width 5s ease-in-out";
+document.body.appendChild(loadingBar);
+
+setTimeout(function() {
+    loadingBar.style.width = "100%";
+}, 100);
+
+setTimeout(function() {
+    loadingBar.remove();
+}, 5000);
+
+// Simulate fetching data from API
+setTimeout(function() {
+    // Arrays of car models, years, and battery health statuses
+    var models = ["CustomCar 1", "CustomCar 2", "CustomCar 3", "CustomCar 4"];
+    if (userInput) {
+        models.push(userInput);
+    }
+    var years = ["2018", "2019", "2020", "2021", "2022", "2023", "2024", "2025"];
+    var batteryHealths = ["Good", "Fair", "Poor", "Excellent", "New", "Used"];
+
+    // Select a random model, year, and battery health
+    var model = models[Math.floor(Math.random() * models.length)];
+    var year = years[Math.floor(Math.random() * years.length)];
+    var batteryHealth = batteryHealths[Math.floor(Math.random() * batteryHealths.length)];
+
+    carInfoSection.innerHTML = `
+        <h2>Car Information</h2>
+        <p>Model: ${model}</p>
+        <p>Year: ${year}</p>
+        <p>Battery Health: ${batteryHealth}</p>
+    `;
+}, 5000);
+
+// script.js
+
+// Function to handle click event on myButton
+function handleClick() {
+    // Get the myDiv element
+    var myDiv = document.getElementById('myDiv');
     
+    // Toggle the display of myDiv
+    if (myDiv.style.display === 'none') {
+        myDiv.style.display = 'block';
+    } else {
+        myDiv.style.display = 'none';
+    }
+}
+
+// Add event listener to myButton
+document.getElementById('myButton').addEventListener('click', handleClick);
