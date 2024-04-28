@@ -1,14 +1,12 @@
 # Car Customization Interface
-
-<<<<<<< HEAD
 Welcome to the Car Customization Interface! 
 
 [image](/assets/pictures/car.jpg)
-=======
-Welcome to the Car Customization Interface, you can [Play the App!](https://kvnbbg.github.io/500Discount/index.html)
+
+[Play the App!](https://kvnbbg.github.io/500Discount/index.html)
 
 [screenshot!](screenshot.jpg)
->>>>>>> c68e3b84b81c9878995df356f59e0e932d0234f6
+
 
 This project aims to provide users with a web interface for customizing electric car mechanisms and user interface themes.
 
