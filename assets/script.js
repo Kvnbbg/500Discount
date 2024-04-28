@@ -99,6 +99,70 @@ setTimeout(function() {
     `;
 }, 5000);
 
+document.addEventListener('DOMContentLoaded', (event) => {
+    // Get the statistics elements
+    const usersElement = document.getElementById('users');
+    const carsElement = document.getElementById('cars');
+    const themesElement = document.getElementById('themes');
+
+    // Generate random data
+    const users = Math.floor(Math.pow(Math.random() * 10, 2));
+    const cars = Math.floor(Math.pow(Math.random() * 10, 2));
+    const themes = Math.floor(Math.pow(Math.random() * 10, 2));
+
+    // Update the statistics elements
+    usersElement.textContent = users;
+    carsElement.textContent = cars;
+    themesElement.textContent = themes;
+});
+
+document.addEventListener('DOMContentLoaded', (event) => {
+    const models = ["CustomCar 1", "CustomCar 2", "CustomCar 3", "CustomCar 4"];
+    const years = ["2018", "2019", "2020", "2021", "2022", "2023", "2024", "2025"];
+    const batteryHealths = ["Good", "Fair", "Poor", "Excellent", "New", "Used"];
+    const carInfoSection = document.getElementById('car-info');
+    const loadingBar = createLoadingBar();
+
+    // Ask the user for a car model
+    var userInput = prompt("Please enter a car model, or leave blank to use a public customized car:");
+    if (userInput) {
+        models.push(userInput);
+    }
+
+    // Simulate loading bar
+    loadingBar.style.width = "100%";
+    setTimeout(() => {
+        loadingBar.remove();
+    }, 5000);
+
+    // Simulate fetching data from API
+    setTimeout(() => {
+        // Select a random model, year, and battery health
+        var model = models[Math.floor(Math.random() * models.length)];
+        var year = years[Math.floor(Math.random() * years.length)];
+        var batteryHealth = batteryHealths[Math.floor(Math.random() * batteryHealths.length)];
+
+        carInfoSection.innerHTML = `
+            <h2>Car Information</h2>
+            <p>Model: ${model}</p>
+            <p>Year: ${year}</p>
+            <p>Battery Health: ${batteryHealth}</p>
+        `;
+    }, 5000);
+});
+
+function createLoadingBar() {
+    var loadingBar = document.createElement("div");
+    loadingBar.style.position = "fixed";
+    loadingBar.style.top = "0";
+    loadingBar.style.left = "0";
+    loadingBar.style.height = "4px";
+    loadingBar.style.width = "0";
+    loadingBar.style.backgroundColor = "#007bff";
+    loadingBar.style.transition = "width 5s ease-in-out";
+    document.body.appendChild(loadingBar);
+    return loadingBar;
+}
 // Function to handle click event on myButton
 function handleClick() {
     // Get the myDiv element
@@ -114,3 +178,21 @@ function handleClick() {
 
 // Add event listener to myButton
 document.getElementById('myButton').addEventListener('click', handleClick);
+
+function toggleDropdown(id) {
+    var dropdown = document.getElementById(id);
+    dropdown.classList.toggle("show");
+  }
+
+  // Close the dropdown menu if the user clicks outside of it
+  window.onclick = function(event) {
+    if (!event.target.matches('.my-element')) {
+      var dropdowns = document.getElementsByClassName("dropdown-menu");
+      for (var i = 0; i < dropdowns.length; i++) {
+        var openDropdown = dropdowns[i];
+        if (openDropdown.classList.contains('show')) {
+          openDropdown.classList.remove('show');
+        }
+      }
+    }
+  }

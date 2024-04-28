@@ -5,23 +5,21 @@ html {
 }
 
 body {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
   background-color: #f9f9f9;
   margin: 0;
   padding: 0;
   box-sizing: border-box;
   border-width: 5px;
   font-size: 1.5rem;
+  max-width: 1260px; /* Maximum width */
+  min-width: 780px; /* Minimum width */
+  margin: 0 auto; /* Center the layout */
 }
 
 /* Define the keyframes for the bounce animation */
 @keyframes bounce {
-  0%,
-  20%,
-  50%,
-  80%,
-  100% {
+  0%, 20%, 50%, 80%, 100% {
     transform: translateY(0); /* Initial and final position (no bounce) */
   }
   40% {
@@ -89,7 +87,6 @@ body {
   background-color: #3e8e41;
 }
 
-
 h1 {
   color: lightskyblue;
   text-align: center;
@@ -135,35 +132,24 @@ main {
 }
 
 ul {
-    list-style-type: none;
-    padding: 0;
+  list-style-type: none;
+  padding: 0;
 }
-
-nav:hover {
-    cursor: pointer; /* Change cursor to pointer on hover */
-    animation: alternate 0.5s ease; /* Add bounce animation */
-    color: #333;
-    transition: color 0.3s ease;
-    content: "\1D57\300\31B"; /* Add this line to display the special character */
-}
-
 
 li {
-    margin-bottom: 5px;
-}
-
-li:hover {
-    color: #333;
-    transition: color 0.3s ease; /* Add smooth transition for link color */
-    animation: fadeIn 0.5s ease; /* Add fade in animation */
-    transition: color 0.3s ease;
-    content: "\279B"; /* Add this line to display the special character */
+  padding: 10px;
+  margin: 10px;
+  border-radius: 4%;
+  border: 1px solid #ccc;
 }
 
 img {
-  width: auto;
-  display: block;
-  margin: 0 auto;
+  width: 100%;
+}
+
+li:hover {
+  background-color: #f0f0f0;
+  animation: fadeIn 0.5s ease; /* Fade in animation */
 }
 
 section {
@@ -177,16 +163,6 @@ div {
   width: 50%;
 }
 
-header:hover{
-  cursor:cell;
-  justify-content: center;
-  align-items: center;
-  color: #333;
-  transition: color 0.3s ease;
-  content: "\1D57\300\31B";
-  flex: 2;
-}
-
 footer {
   background-color: #333;
   color: #fff;
@@ -196,7 +172,7 @@ footer {
   margin-top: 20px;
 }
 
-.container  {
+.container {
   display: flex;
   justify-content: center;
   align-items: center;
