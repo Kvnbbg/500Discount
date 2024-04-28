@@ -1,5 +1,3 @@
-// script.js
-
 // Description: JavaScript file for the interactive car dashboard
 // Link this script to the settings.html file
 
@@ -78,6 +76,7 @@ setTimeout(function() {
     }
     var years = ["2018", "2019", "2020", "2021", "2022", "2023", "2024", "2025"];
     var batteryHealths = ["Good", "Fair", "Poor", "Excellent", "New", "Used"];
+    var faker = require('faker');
 
     // Select a random model, year, and battery health
     var model = models[Math.floor(Math.random() * models.length)];
@@ -85,14 +84,20 @@ setTimeout(function() {
     var batteryHealth = batteryHealths[Math.floor(Math.random() * batteryHealths.length)];
 
     carInfoSection.innerHTML = `
-        <h2>Car Information</h2>
+        <h2>Car ID</h2>
+        <p>Carbon Footprint: ${faker.random.number({min: 1, max: 100})} kg CO2</p>
+        <p>License Plate: ${faker.random.alphaNumeric(8)}</p>
         <p>Model: ${model}</p>
         <p>Year: ${year}</p>
         <p>Battery Health: ${batteryHealth}</p>
+        <p>Carburetor: ${faker.random.arrayElement(["Good", "Fair", "Poor", "Excellent", "New", "Used"])}</p>
+        <p>Engine: ${faker.random.arrayElement(["Good", "Fair", "Poor", "Excellent", "New", "Used"])}</p>
+        <p>Transmission: ${faker.random.arrayElement(["Good", "Fair", "Poor", "Excellent", "New", "Used"])}</p>
+        <p>Brakes: ${faker.random.arrayElement(["Good", "Fair", "Poor", "Excellent", "New", "Used"])}</p>
+        <p>Steering: ${faker.random.arrayElement(["Good", "Fair", "Poor", "Excellent", "New", "Used"])}</p>
+        <p>Exhaust: ${faker.random.arrayElement(["Good", "Fair", "Poor", "Excellent", "New", "Used"])}</p>
     `;
 }, 5000);
-
-// script.js
 
 // Function to handle click event on myButton
 function handleClick() {

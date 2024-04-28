@@ -1,46 +1,180 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" type="image/x-icon" href="assets/pictures/icon.ico">
-    <link rel="stylesheet" href="assets/style.css">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="shortcut icon"
+      type="image/x-icon"
+      href="assets/pictures/icon.ico"
+    />
+    <link rel="stylesheet" href="assets/style.css" />
     <title>Ma Super App - Electric Car Mechanism Interface</title>
-</head>
-<body>
+  </head>
+  <body>
     <header>
-        <a href="index.html">
-            <img src="assets/pictures/pause.jpg" alt="Pause Image" style="width: 100%;" />
-        </a>
-        <h1>Electric Car Mechanism Interface</h1>
+      <a href="index.html">
+        <img
+          src="assets/pictures/pause.jpg"
+          alt="Pause Image"
+          style="width: 100%"
+        />
+      </a>
+      <h1>Electric Car Mechanism Interface</h1>
     </header>
     <nav>
-        <ul>
-            <li><a href="#">Home</a></li>
-            <li><a href="settings.html
-                ">Settings</a></li>
-            <li><a href="themes.html">Themes</a></li>
-            <li><a href="https://kvnbbg.fr">About</a></li>
-        </ul>
+      <ul>
+        <li><a href="index.html">🏠 Home</a></li>
+        <li><a href="#statistics">⚙️ Settings</a></li>
+        <li><a href="#cars">📝 Cars</a></li>
+        <li><a href="#themes">🌈 Themes</a></li>
+        <li><a href="#settings">⚙️ Settings</a></li>
+      </ul>
     </nav>
+    <aside>
+      <p>
+        The Electric Car Mechanism Interface is a web application that allows
+        users to customize the mechanism and user interface of their electric
+        cars. Users can choose from a variety of themes for both the mechanism
+        and user interface, and can also customize the settings of their
+        electric cars.
+      </p>
+    </aside>
+    <sidebar id="statistics">
+      <h2>📊 Statistics</h2>
+      <ul>
+        <li>Number of users: <span id="users">0</span></li>
+        <li>Number of cars: <span id="cars">0</span></li>
+        <li>Number of themes: <span id="themes">0</span></li>
+      </ul>
+      <img
+        class="my-element"
+        src="assets/pictures/myButton.jpg"
+        alt="myButton image"
+      />
+    </sidebar>
     <main>
-        <section>
-            <!-- Display car information here -->
-            <p>
-                The Electric Car Mechanism Interface is a web application that allows users to customize the mechanism and user interface of their electric cars. Users can choose from a variety of themes for both the mechanism and user interface, and can also customize the settings of their electric cars.
-            </p>
-        </section>
-   <br>
-        </main>
-
-            <a href="settings.html">
-                <img class="my-element" src="assets/pictures/myButton.jpg" alt="My Button Image to Settings.html"/>
-            </a>
+      <section id="users">
+        <h2>👥 Users</h2>
+        <ul>
+          <li>John Doe</li>
+          <li>Jane Smith</li>
+          <li>Michael Johnson</li>
+          <li>Emily Davis</li>
+          <li>David Brown</li>
+        </ul>
+      </section>
+      <section id="cars">
+        <h2>🚗 Cars</h2>
+        <ul>
+          <li>Model: UX879</li>
+          <li>Model: C-10:29</li>
+          <li>Model: PURR8</li>
+        </ul>
+        <img
+          src="assets/pictures/car.jpg"
+          alt="Car Info Image"
+          style="width: 100%"
+        />
+      </section>
+      <section id="themes">
+        <h2>🌈 Themes</h2>
+        <ul>
+          <li>Mechanism: Purple</li>
+          <li>Mechanism: Blue</li>
+          <li>Mechanism: Green</li>
+          <li>Interface: XI-MII</li>
+          <li>Interface: XIi</li>
+          <li>Interface: XI</li>
+        </ul>
+        <img
+          src="assets/pictures/themes.jpg"
+          alt="Themes Image"
+          style="width: 100%"
+        />
+      </section>
     </main>
+    <sidebar id="settings">
+      <img
+        src="assets/pictures/custom.jpg"
+        alt="Car Customization Interface"
+        class="image"
+      />
+      <h1>🏎️ Car Customization Interface</h1>
+      <div class="dropdown">
+        <button class="dropbtn">Menu</button>
+        <div class="dropdown-content">
+          <a href="#car-info">Car Info</a>
+          <a href="#features">Features</a>
+          <a href="#latest-updates">Latest Updates</a>
+        </div>
+      </div>
+      <section id="car-info">
+        <section id="car">
+          <h2>🚗 Car</h2>
+          <p>Car: <span id="car">Car</span></p>
+        </section>
+        <section id="model">
+          <h2>🚗 Model</h2>
+          <p>Model: <span id="model">Model</span></p>
+        </section>
+        <section id="year">
+          <h2>🚗 Year</h2>
+          <p>Year: <span id="year">Year</span></p>
+        </section>
+        <section id="color">
+          <h2>🚗 Color</h2>
+          <p>Color: <span id="color">Color</span></p>
+        </section>
+        <section id="price">
+          <h2>🚗 Price</h2>
+          <p>Price: <span id="price">Price</span></p>
+        </section>
+        <section id="controls">
+          <h2>🕹️ Controls</h2>
+          <ul>
+            <li id="left">👈 Left</li>
+            <li id="right">👉 Right</li>
+            <li id="up">👆 Up</li>
+            <li id="down">👇 Down</li>
+          </ul>
+        </section>
+        <aside id="car-customization">
+          <div id="div1"></div>
+          <div id="left"></div>
+          <div id="right"></div>
+          <div id="up"></div>
+          <div id="down"></div>
+        </aside>
+      </section>
+      <section id="features">
+        <h2>🌟 Features</h2>
+        <ul>
+          <li>Customize your car's appearance and settings.</li>
+          <li>Choose from a variety of themes to suit your style.</li>
+          <li>
+            Responsive design ensures a seamless experience on any device.
+          </li>
+          <li>Explore car information such as model and year.</li>
+          <li>Easy navigation with intuitive controls.</li>
+        </ul>
+      </section>
+      <section id="latest-updates">
+        <h2>🚀 Latest Updates</h2>
+        <ul>
+          <li>Added new theme options: Space and Hydrogen.</li>
+          <li>Improved performance for smoother user experience.</li>
+          <li>Enhanced security features for protecting user data.</li>
+          <li>Updated car information database with latest models.</li>
+          <li>Fixed bugs reported by users for better functionality.</li>
+        </ul>
+      </section>
+    </sidebar>
     <footer>
-        <p>&copy; 2024 Electric Car Mechanism Interface</p>
+      <p>&copy; 2024 Electric Car Mechanism Interface</p>
     </footer>
     <script src="assets/script.js"></script>
-    
-</body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Faker/3.1.0/faker.min.js"></script>
+  </body>
 </html>
