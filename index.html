@@ -3,114 +3,94 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link
-      rel="shortcut icon"
-      type="image/x-icon"
-      href="assets/pictures/icon.ico"
-    />
+    <link rel="shortcut icon" type="image/x-icon" href="assets/pictures/icon.ico" />
     <link rel="stylesheet" href="assets/style.css" />
-    <title>Ma Super App - Electric Car Mechanism Interface</title>
+    <title>Ma Super App - Electric Vehicle Interface</title>
   </head>
   <body>
     <header>
       <a href="index.html">
-        <img
-          src="assets/pictures/pause.jpg"
-          alt="Pause Image"
-          style="width: 100%"
-        />
+        <img src="assets/pictures/pause.jpg" alt="Pause Image" class="header-img" />
       </a>
-      <h1>Electric Car Mechanism Interface</h1>
+      <h1>Electric Vehicle Interface</h1>
     </header>
     <nav>
       <div class="dropdown">
         <button class="dropbtn">More</button>
         <div class="dropdown-content">
-          <a href="#car-info">Car Info</a>
+          <a href="#car-info">Car Information</a>
           <a href="#features">Features</a>
           <a href="#latest-updates">Latest Updates</a>
-          <img
-            class="my-element"
-            src="assets/pictures/myButton.jpg"
-            alt="myButton image"
-          />
+          <img class="my-element" src="assets/pictures/myButton.jpg" alt="myButton image" />
         </div>
       </div>
       <ul>
         <li><a href="index.html">🏠 Home</a></li>
-        <li><a href="#statistics">⚙️ Statistics</a></li>
-        <li><a href="#cars">📝 Cars</a></li>
+        <li><a href="#statistics">📊 Statistics</a></li>
+        <li><a href="#cars">🚗 Vehicles</a></li>
         <li><a href="#themes">🌈 Themes</a></li>
         <li><a href="#settings">⚙️ Settings</a></li>
       </ul>
     </nav>
     <aside>
       <p>
-        The Electric Car Mechanism Interface is a web application that allows
-        users to customize the mechanism and user interface of their electric
-        cars. Users can choose from a variety of themes for both the mechanism
-        and user interface, and can also customize the settings of their
-        electric cars.
+        Welcome to the Electric Vehicle Interface, your one-stop solution for customizing the mechanism and user interface of your electric vehicles. Tailor your EV experience with a wide selection of themes and settings to suit your preferences.
       </p>
     </aside>
     <main>
-      <aside id="statistics">
+      <section id="statistics" class="stat-section">
         <h2>📊 Statistics</h2>
         <div class="statistic">
-          <h3>Number of users:</h3>
+          <h3>Total Users:</h3>
           <p id="users">0</p>
         </div>
         <div class="statistic">
-          <h3>Number of cars:</h3>
+          <h3>Total Vehicles:</h3>
           <p id="cars">0</p>
         </div>
         <div class="statistic">
-          <h3>Number of themes:</h3>
+          <h3>Total Themes:</h3>
           <p id="themes">0</p>
         </div>
-      </aside>
-
-      <style>
-        .statistic {
-          border: 1px solid #ccc;
-          padding: 10px;
-          margin: 10px 0;
-        }
-
-        .statistic h3 {
-          margin: 0;
-        }
-
-        .statistic p {
-          font-size: 24px;
-          margin: 0;
-        }
-      </style>
+        <div class="statistic">
+          <h3>Active Sessions:</h3>
+          <p id="sessions">0</p>
+        </div>
+        <div class="statistic">
+          <h3>Customizations Applied:</h3>
+          <p id="customizations">0</p>
+        </div>
+      </section>
       <section id="users">
-        <h2>👥 Best Users</h2>
+        <h2>👥 Top Users</h2>
         <ul>
           <li>John Doe</li>
           <li>Jane Smith</li>
           <li>Michael Johnson</li>
           <li>Emily Davis</li>
           <li>David Brown</li>
+          <li>Sarah Connor</li>
+          <li>Tom Hanks</li>
+          <li>Emma Watson</li>
+          <li>Robert Downey</li>
+          <li>Chris Evans</li>
         </ul>
       </section>
       <section id="cars">
-        <h2>🚗 Best Cars</h2>
+        <h2>🚗 Top Vehicles</h2>
         <ul>
           <li>Model: UX879</li>
           <li>Model: C-10:29</li>
           <li>Model: PURR8</li>
+          <li>Model: EV-300</li>
+          <li>Model: Bolt-11</li>
+          <li>Model: Falcon-Z</li>
+          <li>Model: Charge-X1</li>
         </ul>
-        <img
-          src="assets/pictures/car.jpg"
-          alt="Car Info Image"
-          style="width: 100%"
-        />
+        <img src="assets/pictures/car.jpg" alt="Top Vehicles Image" class="responsive-img" />
       </section>
       <section id="themes">
-        <h2>Themes</h2>
+        <h2>🌈 Available Themes</h2>
         <ul>
           <li>Mechanism: Purple</li>
           <li>Mechanism: Blue</li>
@@ -118,35 +98,26 @@
           <li>Interface: XI-MII</li>
           <li>Interface: XIi</li>
           <li>Interface: XI</li>
+          <li>Mechanism: Red</li>
+          <li>Mechanism: Yellow</li>
+          <li>Interface: Solar</li>
+          <li>Interface: Lunar</li>
         </ul>
-        <img
-          src="assets/pictures/themes.jpg"
-          alt="Themes Image"
-          style="width: 100%"
-        />
+        <img src="assets/pictures/themes.jpg" alt="Themes Image" class="responsive-img" />
       </section>
-      <sidebar id="settings">
+      <section id="settings">
         <section id="car-info">
-          <section id="car">
-            <h2>Car</h2>
-            <p>Car: <span id="car">Skywalker9</span></p>
-          </section>
-          <section id="model">
-            <h2>Model</h2>
+          <h2>Vehicle Information</h2>
+          <div>
+            <p>Vehicle: <span id="car">Skywalker9</span></p>
             <p>Model: <span id="model">Pressure-X</span></p>
-          </section>
-          <section id="year">
-            <h2>Year</h2>
             <p>Year: <span id="year">2016</span></p>
-          </section>
-          <section id="color">
-            <h2>Color</h2>
             <p>Color: <span id="color">Yellow</span></p>
-          </section>
-          <section id="price">
-            <h2>Price</h2>
-            <p>Price: <span id="price">10000</span></p>
-          </section>
+            <p>Price: <span id="price">$10,000</span></p>
+            <p>Mileage: <span id="mileage">45,000 miles</span></p>
+            <p>Battery Health: <span id="battery">85%</span></p>
+            <p>Last Service Date: <span id="service">March 2024</span></p>
+          </div>
           <section id="controls">
             <h2>🕹️ Controls</h2>
             <ul>
@@ -154,6 +125,8 @@
               <li id="right">👉 Right</li>
               <li id="up">👆 Up</li>
               <li id="down">👇 Down</li>
+              <li id="start">🔄 Start</li>
+              <li id="stop">🛑 Stop</li>
             </ul>
           </section>
           <aside id="car-customization">
@@ -162,39 +135,40 @@
             <div id="right"></div>
             <div id="up"></div>
             <div id="down"></div>
+            <div id="start"></div>
+            <div id="stop"></div>
           </aside>
         </section>
         <section id="features">
           <h2>Features</h2>
           <ul>
-            <li>Customize your car's appearance and settings.</li>
-            <li>Choose from a variety of themes to suit your style.</li>
-            <li>
-              Responsive design ensures a seamless experience on any device.
-            </li>
-            <li>Explore car information such as model and year.</li>
-            <li>Easy navigation with intuitive controls.</li>
+            <li>Personalize your vehicle's appearance and settings.</li>
+            <li>Select from a diverse range of themes to match your style.</li>
+            <li>Responsive design ensures a smooth experience across devices.</li>
+            <li>Access detailed vehicle information including model and year.</li>
+            <li>Navigate effortlessly with intuitive controls.</li>
+            <li>Track vehicle performance and maintenance history.</li>
+            <li>Real-time customization previews.</li>
           </ul>
-          <img
-            src="assets/pictures/custom.jpg"
-            alt="Car Customization Interface"
-            class="image"
-          />
+          <img src="assets/pictures/custom.jpg" alt="Vehicle Customization Interface" class="image" />
         </section>
         <section id="latest-updates">
           <h2>🚀 Latest Updates</h2>
           <ul>
-            <li>Added new theme options: Space and Hydrogen.</li>
-            <li>Improved performance for smoother user experience.</li>
-            <li>Enhanced security features for protecting user data.</li>
-            <li>Updated car information database with latest models.</li>
-            <li>Fixed bugs reported by users for better functionality.</li>
+            <li>Introduced new theme options: Space and Hydrogen.</li>
+            <li>Enhanced performance for a smoother user experience.</li>
+            <li>Upgraded security features to safeguard user data.</li>
+            <li>Updated vehicle database with the latest models.</li>
+            <li>Resolved user-reported bugs for improved functionality.</li>
+            <li>Added real-time customization feature.</li>
+            <li>Improved battery health monitoring.</li>
+            <li>Optimized loading times for quicker access.</li>
           </ul>
         </section>
-      </sidebar>
+      </section>
     </main>
     <footer>
-      <p>&copy; 2024 Electric Car Mechanism Interface</p>
+      <p>&copy; 2024 Electric Vehicle Interface. All rights reserved.</p>
     </footer>
     <script src="assets/script.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
