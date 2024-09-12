@@ -78,19 +78,10 @@
       <p id="wallet-address"></p>
     </header>
     <nav>
-      <div class="dropdown">
-        <button class="dropbtn">More</button>
-        <div class="dropdown-content">
-          <a href="#car-info">Car Information</a>
-          <a href="#features">Features</a>
-          <a href="#latest-updates">Latest Updates</a>
-          <img class="my-element" src="assets/pictures/myButton.jpg" alt="myButton image" />
-        </div>
-      </div>
       <ul>
         <li><a href="index.html">🏠 Home</a></li>
         <li><a href="#statistics">📊 Statistics</a></li>
-        <li><a href="#cars">🚗 Vehicles</a></li>
+        <li><a href="#cars">🚗 Play</a></li>
         <li><a href="#themes">🌈 Themes</a></li>
         <li><a href="#settings">⚙️ Settings</a></li>
       </ul>
@@ -133,12 +124,91 @@
         </ul>
       </section>
       <section id="cars">
-        <h2>🚗 Top Vehicles</h2>
-        <ul>
-          <li>Model: UX879</li>
-          <li>Model: C-10:29</li>
-          <li>Model: PUREX8</li>
-        </ul>
+        <h2>🚗 Choose Your Vehicle</h2>
+ <ul>
+  <li>
+    <a href="./carCustomization.html" target="_blank"
+       style="text-decoration: none; color: black; font-size: 18px; position: relative; display: inline-block; transition: color 0.3s ease, transform 0.3s ease;"
+       onmouseover="electricHoverEffect(this)" onmouseout="removeElectricEffect(this)"
+       onclick="boomEffect(event, this);">Model: UX879</a>
+  </li>
+  <li>
+    <a href="./carCustomization.html" target="_blank"
+       style="text-decoration: none; color: black; font-size: 18px; position: relative; display: inline-block; transition: color 0.3s ease, transform 0.3s ease;"
+       onmouseover="electricHoverEffect(this)" onmouseout="removeElectricEffect(this)"
+       onclick="boomEffect(event, this);">Model: C-10:29</a>
+  </li>
+  <li>
+    <a href="./carCustomization.html" target="_blank"
+       style="text-decoration: none; color: black; font-size: 18px; position: relative; display: inline-block; transition: color 0.3s ease, transform 0.3s ease;"
+       onmouseover="electricHoverEffect(this)" onmouseout="removeElectricEffect(this)"
+       onclick="boomEffect(event, this);">Model: PUREX8</a>
+  </li>
+</ul>
+
+<script>
+  // Hover effect: simulate an electric spark effect
+  function electricHoverEffect(element) {
+    element.style.color = 'blue';
+    element.style.boxShadow = '0px 0px 10px 5px rgba(0, 0, 255, 0.7)';
+    element.style.transform = 'scale(1.05)'; // Slight zoom effect
+
+    // Create a small electric spark effect around the element
+    let electricSpark = document.createElement('span');
+    electricSpark.innerHTML = '⚡';
+    electricSpark.style.position = 'absolute';
+    electricSpark.style.top = '-10px';
+    electricSpark.style.left = '100%';
+    electricSpark.style.animation = 'spark 0.5s infinite';
+    electricSpark.classList.add('spark'); // Optional class for better control
+    element.appendChild(electricSpark);
+  }
+
+  // Remove electric spark effect on hover out
+  function removeElectricEffect(element) {
+    element.style.color = 'black';
+    element.style.boxShadow = 'none';
+    element.style.transform = 'scale(1)';
+    const spark = element.querySelector('.spark');
+    if (spark) {
+      spark.remove(); // Remove spark element
+    }
+  }
+
+  // Click effect: "Boom" explosion with electrified pulse
+  function boomEffect(event, element) {
+    event.preventDefault();
+    let explosion = document.createElement('div');
+    explosion.innerHTML = "💥";
+    explosion.style.position = "absolute";
+    explosion.style.top = event.pageY + 'px';
+    explosion.style.left = event.pageX + 'px';
+    explosion.style.fontSize = '50px';
+    explosion.style.color = 'red';
+    explosion.style.animation = 'boom 0.6s ease-out forwards';
+    document.body.appendChild(explosion);
+    setTimeout(() => {
+      explosion.remove(); // Remove explosion after animation
+      window.open(element.href, '_blank'); // Open link in new tab
+    }, 600);
+  }
+
+  // Inline keyframes for electric spark and explosion animation
+  const style = document.createElement('style');
+  style.innerHTML = `
+    @keyframes boom {
+      0% { opacity: 1; transform: scale(1); }
+      100% { opacity: 0; transform: scale(3); }
+    }
+
+    @keyframes spark {
+      0% { opacity: 0; transform: translateX(0); }
+      50% { opacity: 1; transform: translateX(10px); }
+      100% { opacity: 0; transform: translateX(20px); }
+    }
+  `;
+  document.head.appendChild(style);
+</script>
         <img src="assets/pictures/car.jpg" alt="Top Vehicles Image" class="responsive-img" />
       </section>
       <section id="themes">
@@ -164,29 +234,6 @@
             <p>Last Service Date: <span id="service">March 2024</span></p>
           </div>
 
-          <section id="controls">
-            <h2>🕹️ Controls</h2>
-        <section id="game-area">
-        <div id="car" class="car"></div>
-        <div class="controls">
-          <button id="left-btn">⬅️ Left</button>
-          <button id="right-btn">➡️ Right</button>
-          <button id="up-btn">⬆️ Accelerate</button>
-          <button id="stop-btn">🛑 Stop</button>
-        </div>
-      </section>
-
-          <aside id="car-customization">
-         <h4><a href="carCustomization.html">🛻 Car Customization</a> </h4>
-            <div id="div1"><</div>
-            <div id="left"></div>
-            <div id="right"></div>
-            <div id="up"></div>
-            <div id="down"></div>
-            <div id="start"></div>
-            <div id="stop"></div>
-          </aside>
-        </section>
         <section id="features">
           <h2>Features</h2>
           <ul>
