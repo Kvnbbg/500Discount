@@ -5,14 +5,77 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="shortcut icon" type="image/x-icon" href="assets/pictures/icon.ico" />
     <link rel="stylesheet" href="assets/style.css" />
-    <title>Ma Super App - Electric Vehicle Interface</title>
+    <title>Web3 NFT Racing/Fighting Game</title>
+    <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js/dist/web3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+        <style>
+      /* Basic styles */
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #333;
+        color: #fff;
+        text-align: center;
+      }
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+        background-color: #222;
+      }
+      .connect-wallet-btn {
+        background-color: #1c7ed6;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        cursor: pointer;
+        border-radius: 5px;
+      }
+      #wallet-address {
+        margin-top: 10px;
+        font-size: 1.2em;
+        color: #4caf50;
+      }
+      .car {
+        width: 50px;
+        height: 50px;
+        background-color: red;
+        margin: 50px auto;
+        border-radius: 10px;
+      }
+      .controls {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .controls button {
+        padding: 10px 20px;
+        font-size: 1.2em;
+        cursor: pointer;
+        border: none;
+        background-color: #333;
+        color: #fff;
+        border-radius: 5px;
+      }
+      footer {
+        margin-top: 50px;
+        padding: 20px;
+        background-color: #222;
+        color: #fff;
+      }
+    </style>
   </head>
   <body>
+    
     <header>
       <a href="index.html">
         <img src="assets/pictures/pause.jpg" alt="Pause Image" class="header-img" />
       </a>
       <h1>Electric Vehicle Interface</h1>
+      <h4>NFT Racing/Fighting Game Interface</h4>
+      <button id="connect-wallet" class="connect-wallet-btn">Connect Wallet</button>
+      <p id="wallet-address"></p>
     </header>
     <nav>
       <div class="dropdown">
@@ -64,16 +127,9 @@
       <section id="users">
         <h2>👥 Top Users</h2>
         <ul>
-          <li>John Doe</li>
-          <li>Jane Smith</li>
-          <li>Michael Johnson</li>
           <li>Emily Davis</li>
-          <li>David Brown</li>
           <li>Sarah Connor</li>
-          <li>Tom Hanks</li>
           <li>Emma Watson</li>
-          <li>Robert Downey</li>
-          <li>Chris Evans</li>
         </ul>
       </section>
       <section id="cars">
@@ -81,11 +137,7 @@
         <ul>
           <li>Model: UX879</li>
           <li>Model: C-10:29</li>
-          <li>Model: PURR8</li>
-          <li>Model: EV-300</li>
-          <li>Model: Bolt-11</li>
-          <li>Model: Falcon-Z</li>
-          <li>Model: Charge-X1</li>
+          <li>Model: PUREX8</li>
         </ul>
         <img src="assets/pictures/car.jpg" alt="Top Vehicles Image" class="responsive-img" />
       </section>
@@ -95,13 +147,6 @@
           <li>Mechanism: Purple</li>
           <li>Mechanism: Blue</li>
           <li>Mechanism: Green</li>
-          <li>Interface: XI-MII</li>
-          <li>Interface: XIi</li>
-          <li>Interface: XI</li>
-          <li>Mechanism: Red</li>
-          <li>Mechanism: Yellow</li>
-          <li>Interface: Solar</li>
-          <li>Interface: Lunar</li>
         </ul>
         <img src="assets/pictures/themes.jpg" alt="Themes Image" class="responsive-img" />
       </section>
@@ -118,17 +163,21 @@
             <p>Battery Health: <span id="battery">85%</span></p>
             <p>Last Service Date: <span id="service">March 2024</span></p>
           </div>
+
           <section id="controls">
             <h2>🕹️ Controls</h2>
-            <ul>
-              <li id="left">👈 Left</li>
-              <li id="right">👉 Right</li>
-              <li id="up">👆 Up</li>
-              <li id="down">👇 Down</li>
-              <li id="start">🔄 Start</li>
-              <li id="stop">🛑 Stop</li>
-            </ul>
-          </section>
+        <section id="game-area">
+        <h4>🛻 Control Your Vehicle</h4>
+        <div id="car" class="car"></div>
+        <div class="controls">
+          <button id="left-btn">⬅️ Left</button>
+          <button id="right-btn">➡️ Right</button>
+          <button id="up-btn">⬆️ Accelerate</button>
+          <button id="stop-btn">🛑 Stop</button>
+        </div>
+      </section>
+      
+
           <aside id="car-customization">
             <div id="div1"></div>
             <div id="left"></div>
@@ -145,33 +194,80 @@
             <li>Personalize your vehicle's appearance and settings.</li>
             <li>Select from a diverse range of themes to match your style.</li>
             <li>Responsive design ensures a smooth experience across devices.</li>
-            <li>Access detailed vehicle information including model and year.</li>
-            <li>Navigate effortlessly with intuitive controls.</li>
-            <li>Track vehicle performance and maintenance history.</li>
-            <li>Real-time customization previews.</li>
           </ul>
           <img src="assets/pictures/custom.jpg" alt="Vehicle Customization Interface" class="image" />
         </section>
         <section id="latest-updates">
-          <h2>🚀 Latest Updates</h2>
+          <h2>🚀 Latest Updates Incoming...</h2>
           <ul>
             <li>Introduced new theme options: Space and Hydrogen.</li>
             <li>Enhanced performance for a smoother user experience.</li>
             <li>Upgraded security features to safeguard user data.</li>
-            <li>Updated vehicle database with the latest models.</li>
-            <li>Resolved user-reported bugs for improved functionality.</li>
-            <li>Added real-time customization feature.</li>
-            <li>Improved battery health monitoring.</li>
-            <li>Optimized loading times for quicker access.</li>
           </ul>
         </section>
       </section>
     </main>
     <footer>
-      <p>&copy; 2024 Electric Vehicle Interface. All rights reserved.</p>
+      <p>&copy; 2024 NFT Racing/Fighting Web3 Game. All rights reserved.</p>
     </footer>
     <script src="assets/script.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Faker/3.1.0/faker.min.js"></script>
+
+    <script>
+      // Web3 Integration
+      async function connectWallet() {
+        if (window.ethereum) {
+          try {
+            const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+            const walletAddress = accounts[0];
+            document.getElementById('wallet-address').textContent = `Connected: ${walletAddress}`;
+            // Load user's NFTs or other Web3 functionality here
+          } catch (error) {
+            console.error("Error connecting wallet", error);
+          }
+        } else {
+          alert('Please install MetaMask to connect');
+        }
+      }
+
+      document.getElementById('connect-wallet').addEventListener('click', connectWallet);
+
+      // Car Animation using anime.js
+      const car = document.getElementById('car');
+      let carAnimation;
+
+      document.getElementById('left-btn').addEventListener('click', () => {
+        carAnimation = anime({
+          targets: car,
+          translateX: '-=50',
+          duration: 500,
+          easing: 'easeInOutQuad'
+        });
+      });
+
+      document.getElementById('right-btn').addEventListener('click', () => {
+        carAnimation = anime({
+          targets: car,
+          translateX: '+=50',
+          duration: 500,
+          easing: 'easeInOutQuad'
+        });
+      });
+
+      document.getElementById('up-btn').addEventListener('click', () => {
+        carAnimation = anime({
+          targets: car,
+          translateY: '-=50',
+          duration: 500,
+          easing: 'easeInOutQuad'
+        });
+      });
+
+      document.getElementById('stop-btn').addEventListener('click', () => {
+        carAnimation.pause();
+      });
+    </script>
+
   </body>
 </html>
