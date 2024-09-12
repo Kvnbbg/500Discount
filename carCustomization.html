@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Car Control with Three.js</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+        #controls {
+            position: absolute;
+            top: 0;
+            left: 0;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+        .controls button {
+            display: block;
+            margin-top: 10px;
+            font-size: 16px;
+        }
+        #game-area {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            background-color: #eaeaea;
+        }
+    </style>
+</head>
+<body>
+
+<section id="controls">
+    <h2>🕹️ Controls</h2>
+    <section id="game-area">
+        <h4>🛻 Control Your Vehicle</h4>
+        <div id="car"></div>
+        <div class="controls">
+            <button id="left-btn">⬅️ Left</button>
+            <button id="right-btn">➡️ Right</button>
+            <button id="up-btn">⬆️ Accelerate</button>
+            <button id="stop-btn">🛑 Stop</button>
+        </div>
+        
+    <aside id="car-customization">
+        <div id="div1">
+            <button id="back-btn">⏮️ Back</button>
+        </div>
+    </aside>
+</section>
+
+    </section>
+</section>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+    // Setup scene, camera, and renderer
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.shadowMap.enabled = true;
+    document.body.appendChild(renderer.domElement);
+
+    // Add lighting
+    const light = new THREE.DirectionalLight(0xffffff, 1);
+    light.position.set(5, 10, 7.5);
+    light.castShadow = true;
+    scene.add(light);
+
+    const ambientLight = new THREE.AmbientLight(0x404040); // Soft lighting for shadows
+    scene.add(ambientLight);
+
+    // Car Geometry: Using Phong material for more realistic lighting effects
+    const carGeometry = new THREE.BoxGeometry(2, 0.5, 1); // Car body
+    const carMaterial = new THREE.MeshPhongMaterial({ color: 0x0077ff, shininess: 100 });
+    const car = new THREE.Mesh(carGeometry, carMaterial);
+    car.castShadow = true;
+    scene.add(car);
+
+    // Create wheels using better material
+    const wheelGeometry = new THREE.CylinderGeometry(0.2, 0.2, 0.1, 32);
+    const wheelMaterial = new THREE.MeshPhongMaterial({ color: 0x333333 });
+    
+    const wheel1 = new THREE.Mesh(wheelGeometry, wheelMaterial);
+    const wheel2 = new THREE.Mesh(wheelGeometry, wheelMaterial);
+    const wheel3 = new THREE.Mesh(wheelGeometry, wheelMaterial);
+    const wheel4 = new THREE.Mesh(wheelGeometry, wheelMaterial);
+
+    // Adjust wheels' positions and rotations
+    wheel1.position.set(-0.9, -0.3, 0.5);
+    wheel2.position.set(0.9, -0.3, 0.5);
+    wheel3.position.set(-0.9, -0.3, -0.5);
+    wheel4.position.set(0.9, -0.3, -0.5);
+    wheel1.rotation.z = Math.PI / 2;
+    wheel2.rotation.z = Math.PI / 2;
+    wheel3.rotation.z = Math.PI / 2;
+    wheel4.rotation.z = Math.PI / 2;
+
+    wheel1.castShadow = true;
+    wheel2.castShadow = true;
+    wheel3.castShadow = true;
+    wheel4.castShadow = true;
+
+    scene.add(wheel1, wheel2, wheel3, wheel4);
+
+    // Ground plane for the car to cast shadows on
+    const groundGeometry = new THREE.PlaneGeometry(50, 50);
+    const groundMaterial = new THREE.MeshPhongMaterial({ color: 0x999999 });
+    const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+    ground.rotation.x = -Math.PI / 2;
+    ground.position.y = -0.4;
+    ground.receiveShadow = true;
+    scene.add(ground);
+
+    // Camera position and settings
+    camera.position.set(0, 2, 6);
+    camera.lookAt(0, 0, 0);
+
+    let carSpeed = 0;
+    let carRotation = 0;
+    const maxSpeed = 0.1;
+    const acceleration = 0.002;
+    const deceleration = 0.001;
+
+    // Button controls for speed and direction
+    document.getElementById('left-btn').addEventListener('click', () => {
+        carRotation -= 0.05;
+    });
+
+    document.getElementById('right-btn').addEventListener('click', () => {
+        carRotation += 0.05;
+    });
+
+    document.getElementById('up-btn').addEventListener('click', () => {
+        if (carSpeed < maxSpeed) {
+            carSpeed += acceleration;
+        }
+    });
+
+    document.getElementById('stop-btn').addEventListener('click', () => {
+        carSpeed = 0;
+    });
+
+    // Smooth mouse-based movement
+    document.addEventListener('mousemove', (event) => {
+        const mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+        const mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+
+        car.position.x = THREE.MathUtils.lerp(car.position.x, mouseX * 3, 0.1);
+        car.position.y = THREE.MathUtils.lerp(car.position.y, mouseY, 0.1);
+    });
+
+    // Update loop with smooth movement and realistic car behavior
+    function animate() {
+        requestAnimationFrame(animate);
+
+        // Smooth car rotation
+        car.rotation.y = THREE.MathUtils.lerp(car.rotation.y, carRotation, 0.1);
+
+        // Smooth acceleration and deceleration
+        car.position.z -= carSpeed;
+
+        if (carSpeed > 0) {
+            carSpeed -= deceleration;  // Gradual deceleration
+        }
+
+        // Render the scene
+        renderer.render(scene, camera);
+    }
+
+    animate();
+
+    // Handle window resizing
+    window.addEventListener('resize', () => {
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+    });
+</script>
+
+</body>
+</html>
