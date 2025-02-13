@@ -1,321 +1,571 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="shortcut icon" type="image/x-icon" href="assets/pictures/icon.ico" />
-    <link rel="stylesheet" href="assets/style.css" />
-    <title>Web3 NFT Racing/Fighting Game</title>
-    <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js/dist/web3.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
-        <style>
-      /* Basic styles */
-      body {
-        font-family: Arial, sans-serif;
-        background-color: #333;
-        color: #fff;
-        text-align: center;
-      }
-      header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 20px;
-        background-color: #222;
-      }
-      .connect-wallet-btn {
-        background-color: #1c7ed6;
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        cursor: pointer;
-        border-radius: 5px;
-      }
-      #wallet-address {
-        margin-top: 10px;
-        font-size: 1.2em;
-        color: #4caf50;
-      }
-      .car {
-        width: 50px;
-        height: 50px;
-        background-color: red;
-        margin: 50px auto;
-        border-radius: 10px;
-      }
-      .controls {
-        display: flex;
-        justify-content: center;
-        gap: 10px;
-        margin-top: 20px;
-      }
-      .controls button {
-        padding: 10px 20px;
-        font-size: 1.2em;
-        cursor: pointer;
-        border: none;
-        background-color: #333;
-        color: #fff;
-        border-radius: 5px;
-      }
-      footer {
-        margin-top: 50px;
-        padding: 20px;
-        background-color: #222;
-        color: #fff;
-      }
-    </style>
-  </head>
-  <body>
-    
-    <header>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="shortcut icon" type="image/x-icon" href="assets/pictures/icon.ico" />
+  <link rel="stylesheet" href="assets/style.css" />
+  <title>Racing Game / Jeu de Course</title>
+  <!-- External libraries -->
+  <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js/dist/web3.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+  <style>
+    /* Global Styles */
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #333;
+      color: #fff;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      background-color: #222;
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .header-left img {
+      width: 40px;
+      height: 40px;
+    }
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .connect-wallet-btn, #language-toggle {
+      background-color: #1c7ed6;
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    nav {
+      background-color: #444;
+      padding: 10px;
+    }
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      margin: 0;
+      padding: 0;
+    }
+    nav ul li a {
+      text-decoration: none;
+      color: #fff;
+    }
+    /* Floating Bubble Button */
+    .floating-button {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #1c7ed6;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      color: #fff;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      z-index: 1000;
+      text-decoration: none;
+      transition: background-color 0.3s ease;
+    }
+    .floating-button:hover {
+      background-color: #155a9c;
+    }
+    /* Main & Dashboard Layout */
+    main {
+      padding: 20px;
+    }
+    .game-area {
+      background-color: #222;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      position: relative;
+    }
+    #game-canvas {
+      background: #555;
+      height: 300px;
+      border-radius: 8px;
+      position: relative;
+    }
+    /* The simulated car */
+    #car {
+      width: 50px;
+      height: 50px;
+      background: red;
+      position: absolute;
+      top: 125px;
+      left: 0;
+      border-radius: 10px;
+    }
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .controls button {
+      padding: 10px 20px;
+      font-size: 1em;
+      cursor: pointer;
+      border: none;
+      background-color: #1c7ed6;
+      color: #fff;
+      border-radius: 5px;
+    }
+    /* Dashboard Grid */
+    .dashboard {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+    .dashboard section {
+      background-color: #444;
+      padding: 15px;
+      border-radius: 8px;
+    }
+    .dashboard img.responsive-img {
+      max-width: 100%;
+      border-radius: 5px;
+      margin-top: 10px;
+    }
+    footer {
+      background-color: #222;
+      padding: 20px;
+      text-align: center;
+      margin-top: 20px;
+    }
+    footer .social-links a {
+      color: #fff;
+      margin: 0 5px;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header with logo, bilingual toggle and wallet button -->
+  <header>
+    <div class="header-left">
       <a href="index.html">
-        <img src="assets/pictures/pause.jpg" alt="Pause Image" class="header-img" />
+        <img src="assets/pictures/pause.jpg" alt="Logo" />
       </a>
-      <h1>Electric Vehicle Interface</h1>
-      <h4>NFT Racing/Fighting Game Interface</h4>
-      <button id="connect-wallet" class="connect-wallet-btn">Connect Wallet</button>
+      <div>
+        <h1 data-lang-key="headerTitle">Electric Vehicle Interface</h1>
+        <h4 data-lang-key="headerSubtitle">NFT Racing/Fighting Game Interface</h4>
+      </div>
+    </div>
+    <div class="header-right">
+      <button id="language-toggle">FR</button>
+      <button id="connect-wallet" class="connect-wallet-btn" data-lang-key="connectWallet">Connect Wallet</button>
       <p id="wallet-address"></p>
-    </header>
-    <nav>
-      <ul>
-        <li><a href="index.html">🏠 Home</a></li>
-        <li><a href="#statistics">📊 Statistics</a></li>
-        <li><a href="#cars">🚗 Play</a></li>
-        <li><a href="#themes">🌈 Themes</a></li>
-        <li><a href="#settings">⚙️ Settings</a></li>
-      </ul>
-    </nav>
-    <aside>
-      <p>
-        Welcome to the Electric Vehicle Interface, your one-stop solution for customizing the mechanism and user interface of your electric vehicles. Tailor your EV experience with a wide selection of themes and settings to suit your preferences.
-      </p>
-    </aside>
-    <main>
+    </div>
+  </header>
 
+  <!-- Navigation Menu -->
+  <nav>
+    <ul>
+      <li><a href="index.html" data-lang-key="navHome">🏠 Home</a></li>
+      <li><a href="#statistics" data-lang-key="navStats">📊 Statistics</a></li>
+      <li><a href="#game" data-lang-key="navPlay">🚗 Play</a></li>
+      <li><a href="#themes" data-lang-key="navThemes">🌈 Themes</a></li>
+      <li><a href="#settings" data-lang-key="navSettings">⚙️ Settings</a></li>
+    </ul>
+  </nav>
+
+  <!-- Floating Bubble Button linking to the store -->
+  <a href="carCustomization.html" class="floating-button" title="Magasin" data-lang-key="floatingButton">🛒</a>
+
+  <main>
+    <!-- Game Area -->
+    <section id="game" class="game-area">
+      <h2 data-lang-key="gameTitle">Racing Game</h2>
+      <div id="game-canvas">
+        <div id="car"></div>
+      </div>
+      <div class="controls">
+        <button id="left-btn" data-lang-key="btnLeft">Left</button>
+        <button id="up-btn" data-lang-key="btnUp">Up</button>
+        <button id="right-btn" data-lang-key="btnRight">Right</button>
+        <button id="stop-btn" data-lang-key="btnStop">Stop</button>
+      </div>
+      <p id="game-status"></p>
+    </section>
+
+    <!-- Dashboard with Additional Features -->
+    <div class="dashboard">
+      <!-- Top Users -->
       <section id="users">
-        <h2>👥 Top Users</h2>
+        <h2 data-lang-key="topUsers">👥 Top Users</h2>
         <ul>
           <li>Kevin Davis</li>
           <li>Sarah Taal</li>
           <li>Emma Watson</li>
         </ul>
       </section>
-            <section id="themes">
-        <h2>🌈 Available Themes</h2>
+
+      <!-- Available Themes -->
+      <section id="themes">
+        <h2 data-lang-key="availableThemes">🌈 Available Themes</h2>
         <ul>
-          <li>Surfer</li>
-          <li>Avenger Blue</li>
-          <li>Green Lantern</li>
+          <li data-lang-key="theme1">Surfer</li>
+          <li data-lang-key="theme2">Avenger Blue</li>
+          <li data-lang-key="theme3">Green Lantern</li>
         </ul>
         <img src="assets/pictures/themes.jpg" alt="Themes Image" class="responsive-img" />
       </section>
+
+      <!-- Choose Your Vehicle -->
       <section id="cars">
-        <h2>🚗 Choose Your Vehicle</h2>
- <ul>
-  <li>
-    <a href="./carCustomization.html" target="_blank"
-       style="text-decoration: none; color: white; font-size: 18px; position: relative; display: inline-block; transition: color 0.3s ease, transform 0.3s ease;"
-       onmouseover="electricHoverEffect(this)" onmouseout="removeElectricEffect(this)"
-       onclick="boomEffect(event, this);">Model: UX879</a>
-  </li>
-  <li>
-    <a href="./carCustomization.html" target="_blank"
-       style="text-decoration: none; color: white; font-size: 18px; position: relative; display: inline-block; transition: color 0.3s ease, transform 0.3s ease;"
-       onmouseover="electricHoverEffect(this)" onmouseout="removeElectricEffect(this)"
-       onclick="boomEffect(event, this);">Model: C-10:29</a>
-  </li>
-  <li>
-    <a href="./carCustomization.html" target="_blank"
-       style="text-decoration: none; color: white; font-size: 18px; position: relative; display: inline-block; transition: color 0.3s ease, transform 0.3s ease;"
-       onmouseover="electricHoverEffect(this)" onmouseout="removeElectricEffect(this)"
-       onclick="boomEffect(event, this);">Model: PUREX8</a>
-  </li>
-</ul>
-
-<script>
-  // Hover effect: simulate an electric spark effect
-  function electricHoverEffect(element) {
-    element.style.color = 'blue';
-    element.style.boxShadow = '0px 0px 10px 5px rgba(0, 0, 255, 0.7)';
-    element.style.transform = 'scale(1.05)'; // Slight zoom effect
-
-    // Create a small electric spark effect around the element
-    let electricSpark = document.createElement('span');
-    electricSpark.innerHTML = '⚡';
-    electricSpark.style.position = 'absolute';
-    electricSpark.style.top = '-10px';
-    electricSpark.style.left = '100%';
-    electricSpark.style.animation = 'spark 0.5s infinite';
-    electricSpark.classList.add('spark'); // Optional class for better control
-    element.appendChild(electricSpark);
-  }
-
-  // Remove electric spark effect on hover out
-  function removeElectricEffect(element) {
-    element.style.color = 'black';
-    element.style.boxShadow = 'none';
-    element.style.transform = 'scale(1)';
-    const spark = element.querySelector('.spark');
-    if (spark) {
-      spark.remove(); // Remove spark element
-    }
-  }
-
-  // Click effect: "Boom" explosion with electrified pulse
-  function boomEffect(event, element) {
-    event.preventDefault();
-    let explosion = document.createElement('div');
-    explosion.innerHTML = "💥";
-    explosion.style.position = "absolute";
-    explosion.style.top = event.pageY + 'px';
-    explosion.style.left = event.pageX + 'px';
-    explosion.style.fontSize = '50px';
-    explosion.style.color = 'red';
-    explosion.style.animation = 'boom 0.6s ease-out forwards';
-    document.body.appendChild(explosion);
-    setTimeout(() => {
-      explosion.remove(); // Remove explosion after animation
-      window.open(element.href, '_blank'); // Open link in new tab
-    }, 600);
-  }
-
-  // Inline keyframes for electric spark and explosion animation
-  const style = document.createElement('style');
-  style.innerHTML = `
-    @keyframes boom {
-      0% { opacity: 1; transform: scale(1); }
-      100% { opacity: 0; transform: scale(3); }
-    }
-
-    @keyframes spark {
-      0% { opacity: 0; transform: translateX(0); }
-      50% { opacity: 1; transform: translateX(10px); }
-      100% { opacity: 0; transform: translateX(20px); }
-    }
-  `;
-  document.head.appendChild(style);
-</script>
+        <h2 data-lang-key="chooseVehicle">🚗 Choose Your Vehicle</h2>
+        <ul>
+          <li>
+            <a href="carCustomization.html" target="_blank"
+               style="text-decoration: none; color: white; font-size: 18px; position: relative; transition: color 0.3s ease, transform 0.3s ease;"
+               onmouseover="electricHoverEffect(this)" onmouseout="removeElectricEffect(this)"
+               onclick="boomEffect(event, this);">Model: UX879</a>
+          </li>
+          <li>
+            <a href="carCustomization.html" target="_blank"
+               style="text-decoration: none; color: white; font-size: 18px; position: relative; transition: color 0.3s ease, transform 0.3s ease;"
+               onmouseover="electricHoverEffect(this)" onmouseout="removeElectricEffect(this)"
+               onclick="boomEffect(event, this);">Model: C-10:29</a>
+          </li>
+          <li>
+            <a href="carCustomization.html" target="_blank"
+               style="text-decoration: none; color: white; font-size: 18px; position: relative; transition: color 0.3s ease, transform 0.3s ease;"
+               onmouseover="electricHoverEffect(this)" onmouseout="removeElectricEffect(this)"
+               onclick="boomEffect(event, this);">Model: PUREX8</a>
+          </li>
+        </ul>
         <img src="assets/pictures/car.jpg" alt="Top Vehicles Image" class="responsive-img" />
       </section>
 
-            <section id="statistics" class="stat-section">
-        <h2>📊 Statistics</h2>
+      <!-- Statistics -->
+      <section id="statistics">
+        <h2 data-lang-key="statistics">📊 Statistics</h2>
         <div class="statistic">
-          <h3>Total Users:</h3>
-          <p id="users">0</p>
+          <h3 data-lang-key="totalUsers">Total Users:</h3>
+          <p id="stat-users">0</p>
         </div>
         <div class="statistic">
-          <h3>Total Vehicles:</h3>
-          <p id="cars">0</p>
+          <h3 data-lang-key="totalVehicles">Total Vehicles:</h3>
+          <p id="stat-cars">0</p>
         </div>
         <div class="statistic">
-          <h3>Total Themes:</h3>
-          <p id="themes">0</p>
+          <h3 data-lang-key="totalThemes">Total Themes:</h3>
+          <p id="stat-themes">0</p>
         </div>
         <div class="statistic">
-          <h3>Active Sessions:</h3>
-          <p id="sessions">0</p>
+          <h3 data-lang-key="activeSessions">Active Sessions:</h3>
+          <p id="stat-sessions">0</p>
         </div>
         <div class="statistic">
-          <h3>Customizations Applied:</h3>
-          <p id="customizations">0</p>
+          <h3 data-lang-key="customizations">Customizations Applied:</h3>
+          <p id="stat-customizations">0</p>
         </div>
       </section>
-      <section id="settings">
-        <section id="car-info">
-          <h2>Vehicle Information</h2>
-          <div>
-            <p>Vehicle: <span id="car">Skywalker9</span></p>
-            <p>Model: <span id="model">Pressure-X</span></p>
-            <p>Year: <span id="year">2016</span></p>
-            <p>Color: <span id="color">Yellow</span></p>
-            <p>Price: <span id="price">$10,000</span></p>
-            <p>Mileage: <span id="mileage">45,000 miles</span></p>
-            <p>Battery Health: <span id="battery">85%</span></p>
-            <p>Last Service Date: <span id="service">March 2024</span></p>
-          </div>
 
+      <!-- Vehicle Information & Features -->
+      <section id="settings">
+        <h2 data-lang-key="vehicleInfo">Vehicle Information</h2>
+        <div>
+          <p data-lang-key="vehicleName">Vehicle: <span id="car-name">Skywalker9</span></p>
+          <p data-lang-key="vehicleModel">Model: <span id="car-model">Pressure-X</span></p>
+          <p data-lang-key="vehicleYear">Year: <span id="car-year">2016</span></p>
+          <p data-lang-key="vehicleColor">Color: <span id="car-color">Yellow</span></p>
+          <p data-lang-key="vehiclePrice">Price: <span id="car-price">$10,000</span></p>
+          <p data-lang-key="vehicleMileage">Mileage: <span id="car-mileage">45,000 miles</span></p>
+          <p data-lang-key="batteryHealth">Battery Health: <span id="car-battery">85%</span></p>
+          <p data-lang-key="lastService">Last Service Date: <span id="car-service">March 2024</span></p>
+        </div>
         <section id="features">
-          <h2>Features</h2>
+          <h2 data-lang-key="features">Features</h2>
           <ul>
-            <li>Personalize your vehicle's appearance and settings.</li>
-            <li>Select from a diverse range of themes to match your style.</li>
-            <li>Responsive design ensures a smooth experience across devices.</li>
+            <li data-lang-key="feature1">Personalize your vehicle's appearance and settings.</li>
+            <li data-lang-key="feature2">Select from a diverse range of themes to match your style.</li>
+            <li data-lang-key="feature3">Responsive design ensures a smooth experience across devices.</li>
           </ul>
-          <img src="assets/pictures/custom.jpg" alt="Vehicle Customization Interface" class="image" />
+          <img src="assets/pictures/custom.jpg" alt="Vehicle Customization Interface" class="responsive-img" />
         </section>
         <section id="latest-updates">
-          <h2>🚀 Latest Updates Incoming...</h2>
+          <h2 data-lang-key="latestUpdates">🚀 Latest Updates Incoming...</h2>
           <ul>
-            <li>Introduced new theme options: Space and Hydrogen.</li>
-            <li>Enhanced performance for a smoother user experience.</li>
-            <li>Upgraded security features to safeguard user data.</li>
+            <li data-lang-key="update1">Introduced new theme options: Space and Hydrogen.</li>
+            <li data-lang-key="update2">Enhanced performance for a smoother user experience.</li>
+            <li data-lang-key="update3">Upgraded security features to safeguard user data.</li>
           </ul>
         </section>
       </section>
-    </main>
-    <footer>
-      <p>&copy; 2024 NFT Racing/Fighting Web3 Game. All rights reserved.</p>
-    </footer>
-    <script src="assets/script.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Faker/3.1.0/faker.min.js"></script>
+    </div>
+  </main>
 
-    <script>
-      // Web3 Integration
-      async function connectWallet() {
-        if (window.ethereum) {
-          try {
-            const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-            const walletAddress = accounts[0];
-            document.getElementById('wallet-address').textContent = `Connected: ${walletAddress}`;
-            // Load user's NFTs or other Web3 functionality here
-          } catch (error) {
-            console.error("Error connecting wallet", error);
-          }
-        } else {
-          alert('Please install MetaMask to connect');
-        }
+  <!-- Footer with social links -->
+  <footer>
+    <div class="social-links">
+      <a href="https://kvnbbg.fr" target="_blank">Blog</a>
+      <a href="https://www.instagram.com/techandstream" target="_blank">Instagram</a>
+      <a href="https://www.threads.net/@techandstream" target="_blank">Threads</a>
+      <a href="https://x.com/techandstream" target="_blank">X</a>
+      <a href="https://www.youtube.com/techandstream" target="_blank">YouTube</a>
+      <a href="https://www.facebook.com/kvnbbg" target="_blank">Facebook</a>
+    </div>
+    <p>&copy; 2024 NFT Racing/Fighting Web3 Game. All rights reserved.</p>
+  </footer>
+
+  <!-- Scripts -->
+  <script>
+    /* ------------------------------
+       Bilingual Toggle Functionality
+    ------------------------------- */
+    const translations = {
+      en: {
+        headerTitle: "Electric Vehicle Interface",
+        headerSubtitle: "NFT Racing/Fighting Game Interface",
+        connectWallet: "Connect Wallet",
+        navHome: "🏠 Home",
+        navStats: "📊 Statistics",
+        navPlay: "🚗 Play",
+        navThemes: "🌈 Themes",
+        navSettings: "⚙️ Settings",
+        floatingButton: "🛒",
+        gameTitle: "Racing Game",
+        btnLeft: "Left",
+        btnUp: "Up",
+        btnRight: "Right",
+        btnStop: "Stop",
+        topUsers: "👥 Top Users",
+        availableThemes: "🌈 Available Themes",
+        theme1: "Surfer",
+        theme2: "Avenger Blue",
+        theme3: "Green Lantern",
+        chooseVehicle: "🚗 Choose Your Vehicle",
+        statistics: "📊 Statistics",
+        totalUsers: "Total Users:",
+        totalVehicles: "Total Vehicles:",
+        totalThemes: "Total Themes:",
+        activeSessions: "Active Sessions:",
+        customizations: "Customizations Applied:",
+        vehicleInfo: "Vehicle Information",
+        vehicleName: "Vehicle:",
+        vehicleModel: "Model:",
+        vehicleYear: "Year:",
+        vehicleColor: "Color:",
+        vehiclePrice: "Price:",
+        vehicleMileage: "Mileage:",
+        batteryHealth: "Battery Health:",
+        lastService: "Last Service Date:",
+        features: "Features",
+        feature1: "Personalize your vehicle's appearance and settings.",
+        feature2: "Select from a diverse range of themes to match your style.",
+        feature3: "Responsive design ensures a smooth experience across devices.",
+        latestUpdates: "🚀 Latest Updates Incoming...",
+        update1: "Introduced new theme options: Space and Hydrogen.",
+        update2: "Enhanced performance for a smoother user experience.",
+        update3: "Upgraded security features to safeguard user data."
+      },
+      fr: {
+        headerTitle: "Interface Véhicule Électrique",
+        headerSubtitle: "Interface de Jeu NFT Course/Combat",
+        connectWallet: "Connecter le portefeuille",
+        navHome: "🏠 Accueil",
+        navStats: "📊 Statistiques",
+        navPlay: "🚗 Jouer",
+        navThemes: "🌈 Thèmes",
+        navSettings: "⚙️ Paramètres",
+        floatingButton: "🛒",
+        gameTitle: "Jeu de Course",
+        btnLeft: "Gauche",
+        btnUp: "Haut",
+        btnRight: "Droite",
+        btnStop: "Arrêter",
+        topUsers: "👥 Meilleurs Utilisateurs",
+        availableThemes: "🌈 Thèmes Disponibles",
+        theme1: "Surfer",
+        theme2: "Avenger Blue",
+        theme3: "Green Lantern",
+        chooseVehicle: "🚗 Choisissez Votre Véhicule",
+        statistics: "📊 Statistiques",
+        totalUsers: "Utilisateurs Totaux:",
+        totalVehicles: "Véhicules Totaux:",
+        totalThemes: "Thèmes Totaux:",
+        activeSessions: "Sessions Actives:",
+        customizations: "Personnalisations Appliquées:",
+        vehicleInfo: "Informations sur le Véhicule",
+        vehicleName: "Véhicule:",
+        vehicleModel: "Modèle:",
+        vehicleYear: "Année:",
+        vehicleColor: "Couleur:",
+        vehiclePrice: "Prix:",
+        vehicleMileage: "Kilométrage:",
+        batteryHealth: "Santé de la Batterie:",
+        lastService: "Dernière Date de Service:",
+        features: "Caractéristiques",
+        feature1: "Personnalisez l'apparence et les réglages de votre véhicule.",
+        feature2: "Choisissez parmi une gamme diversifiée de thèmes selon votre style.",
+        feature3: "Un design réactif pour une expérience fluide sur tous les appareils.",
+        latestUpdates: "🚀 Dernières Mises à Jour...",
+        update1: "Nouvelles options de thèmes: Espace et Hydrogène.",
+        update2: "Performance améliorée pour une expérience utilisateur plus fluide.",
+        update3: "Sécurité renforcée pour protéger les données utilisateurs."
       }
+    };
 
-      document.getElementById('connect-wallet').addEventListener('click', connectWallet);
+    let currentLang = "en";
+    const langToggleBtn = document.getElementById("language-toggle");
+    langToggleBtn.addEventListener("click", () => {
+      currentLang = currentLang === "en" ? "fr" : "en";
+      updateLanguage();
+      langToggleBtn.textContent = currentLang === "en" ? "FR" : "EN";
+    });
 
-      // Car Animation using anime.js
-      const car = document.getElementById('car');
-      let carAnimation;
-
-      document.getElementById('left-btn').addEventListener('click', () => {
-        carAnimation = anime({
-          targets: car,
-          translateX: '-=50',
-          duration: 500,
-          easing: 'easeInOutQuad'
-        });
+    function updateLanguage() {
+      const elements = document.querySelectorAll("[data-lang-key]");
+      elements.forEach(el => {
+        const key = el.getAttribute("data-lang-key");
+        if (translations[currentLang][key]) {
+          el.textContent = translations[currentLang][key];
+        }
       });
+    }
 
-      document.getElementById('right-btn').addEventListener('click', () => {
-        carAnimation = anime({
-          targets: car,
-          translateX: '+=50',
-          duration: 500,
-          easing: 'easeInOutQuad'
-        });
+    /* ------------------------------
+       Web3 Wallet Connection
+    ------------------------------- */
+    async function connectWallet() {
+      if (window.ethereum) {
+        try {
+          const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+          const walletAddress = accounts[0];
+          document.getElementById('wallet-address').textContent = `Connected: ${walletAddress}`;
+        } catch (error) {
+          console.error("Error connecting wallet", error);
+        }
+      } else {
+        alert('Please install MetaMask to connect');
+      }
+    }
+    document.getElementById('connect-wallet').addEventListener('click', connectWallet);
+
+    /* ------------------------------
+       Game Logic & Animation
+    ------------------------------- */
+    const carElement = document.getElementById('car');
+    let carPosition = 0;
+    const gameCanvas = document.getElementById('game-canvas');
+
+    function updateCarPosition() {
+      carElement.style.left = carPosition + "px";
+    }
+
+    document.getElementById('left-btn').addEventListener('click', () => {
+      if (carPosition > 0) {
+        carPosition -= 10;
+        updateCarPosition();
+      }
+    });
+
+    document.getElementById('right-btn').addEventListener('click', () => {
+      const maxPosition = gameCanvas.offsetWidth - carElement.offsetWidth;
+      if (carPosition < maxPosition) {
+        carPosition += 10;
+        updateCarPosition();
+      }
+      if (carPosition >= maxPosition - 50) {
+        document.getElementById('game-status').textContent = 
+          currentLang === "en" ? "White Car Won!" : "La voiture blanche a gagné!";
+      }
+    });
+
+    document.getElementById('up-btn').addEventListener('click', () => {
+      // Example jump effect using anime.js
+      anime({
+        targets: carElement,
+        translateY: -50,
+        duration: 300,
+        easing: 'easeOutQuad',
+        direction: 'alternate'
       });
+    });
 
-      document.getElementById('up-btn').addEventListener('click', () => {
-        carAnimation = anime({
-          targets: car,
-          translateY: '-=50',
-          duration: 500,
-          easing: 'easeInOutQuad'
-        });
-      });
+    document.getElementById('stop-btn').addEventListener('click', () => {
+      // This demo stops any ongoing anime.js animation if needed.
+      anime.remove(carElement);
+    });
 
-      document.getElementById('stop-btn').addEventListener('click', () => {
-        carAnimation.pause();
-      });
-    </script>
+    /* ------------------------------
+       Electric Hover & Boom Effects
+    ------------------------------- */
+    function electricHoverEffect(element) {
+      element.style.color = 'blue';
+      element.style.boxShadow = '0px 0px 10px 5px rgba(0, 0, 255, 0.7)';
+      element.style.transform = 'scale(1.05)';
+      let electricSpark = document.createElement('span');
+      electricSpark.innerHTML = '⚡';
+      electricSpark.style.position = 'absolute';
+      electricSpark.style.top = '-10px';
+      electricSpark.style.left = '100%';
+      electricSpark.style.animation = 'spark 0.5s infinite';
+      electricSpark.classList.add('spark');
+      element.appendChild(electricSpark);
+    }
 
-  </body>
+    function removeElectricEffect(element) {
+      element.style.color = 'white';
+      element.style.boxShadow = 'none';
+      element.style.transform = 'scale(1)';
+      const spark = element.querySelector('.spark');
+      if (spark) {
+        spark.remove();
+      }
+    }
+
+    function boomEffect(event, element) {
+      event.preventDefault();
+      let explosion = document.createElement('div');
+      explosion.innerHTML = "💥";
+      explosion.style.position = "absolute";
+      explosion.style.top = event.pageY + 'px';
+      explosion.style.left = event.pageX + 'px';
+      explosion.style.fontSize = '50px';
+      explosion.style.color = 'red';
+      explosion.style.animation = 'boom 0.6s ease-out forwards';
+      document.body.appendChild(explosion);
+      setTimeout(() => {
+        explosion.remove();
+        window.open(element.href, '_blank');
+      }, 600);
+    }
+
+    // Inline keyframes for spark and boom animations
+    const style = document.createElement('style');
+    style.innerHTML = `
+      @keyframes boom {
+        0% { opacity: 1; transform: scale(1); }
+        100% { opacity: 0; transform: scale(3); }
+      }
+      @keyframes spark {
+        0% { opacity: 0; transform: translateX(0); }
+        50% { opacity: 1; transform: translateX(10px); }
+        100% { opacity: 0; transform: translateX(20px); }
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Initialize the language on page load
+    updateLanguage();
+  </script>
+</body>
 </html>
