@@ -1,84 +1,121 @@
 # Tokyo TCG Hub & Star Bazaar
 
-Welcome to **Tokyo TCG Hub & Star Bazaar** – the ultimate retro-inspired, AI-powered hub where electrified trading card duels meet futuristic car customization! This immersive interface fuses advanced electric car tech with gamified quests, dynamic challenges, and interactive digital tools, tailored for tech enthusiasts and car aficionados alike.
+A retro-futuristic, single-page web experience that blends trading card quests, electric car customization vibes, and playful productivity tools (coin game, math calculator, memo windows) into one immersive interface.
 
 ![Car Image](/assets/pictures/car.jpg)
 
 [Play the App!](https://kvnbbg.github.io/500Discount/index.html)
 
-![Screenshot](screenshot.jpg)
+## Product Scope
 
-This web application offers a seamless one-screen experience featuring:
-- **Retro Visuals & Animated Ambiance:** Enjoy an animated, neon-lit gradient background with pulsing retro fonts for that authentic arcade feel.
-- **Dynamic AI Insights:** Our AI loop delivers a mix of facts, giveaways, inspiring quotes, and imaginative landscape descriptions.
-- **Gamified Quests:** Transform routine tasks into epic quests—complete challenges related to tech and electric car customization to earn rewards and boost your score.
-- **Advanced Customization:** Tailor electric car mechanisms and diverse UI themes to build your ultimate futuristic ride.
-- **Integrated Tools:** Engage with an interactive task manager, tackle a challenging coin game, use a handy math calculator, and quickly capture ideas with “Some time as Mémo.”
-- **Responsive Design:** Optimized for mobile, desktop, and Mac environments, all in a smooth one-screen layout.
+Tokyo TCG Hub & Star Bazaar is a static web experience that delivers:
 
-## Overview
+- A one-screen retro arcade UI with animated ambiance.
+- Quest checklists that reward you with a progress score.
+- A coin-combination mini-game for tactical decision-making.
+- A safe, in-browser math calculator.
+- Memo windows for jotting down ideas.
 
-**Tokyo TCG Hub & Star Bazaar** invites you to:
-- **Customize Your Ride:** Select from an array of mechanism set themes (e.g., Space, Town Worker, Hydrogen, Hydro-electric) and interface styles (e.g., Sexy, Japanese, Serious, Hacker-shade) to power your electric car.
-- **Embark on Quests:** Engage in gamified tasks designed as quests where each challenge—such as optimizing your card deck—earns you rewards and unlocks tech upgrades.
-- **Experience AI-Powered Inspiration:** Let our dynamic AI loop share a medley of interesting facts, giveaways, inspiring quotes, and vivid, imaginative descriptions to spark your creativity.
-- **Stay Organized with “Some time as Mémo”:** Replace traditional virtual desktops with a simple note-taking feature to capture your ideas and progress.
+## Prerequisites
 
-## Features 🌟
+- **Node.js 20+** (for linting, tests, and build-time config generation)
+- **Python 3** or any static file server (for local previewing)
 
-- **Retro-Themed UI & Animations:** An animated gradient backdrop and pulsing retro fonts set the stage for a nostalgic arcade experience.
-- **Dynamic AI Insights:** Enjoy AI messages such as:
-  - *"Did you know? Electric cars are redefining the future of mobility."*
-  - *"Quote: 'Innovation distinguishes between a leader and a follower.' – Steve Jobs."*
-  - *"Giveaway: Earn bonus points on your next quest!"*
-  - *"Landscape: Imagine a neon cityscape where every card sparks a revolution."*
-- **Gamified Quest System:** Transform everyday tasks into quests. Complete challenges—like powering up your card deck or fine-tuning tech parameters—to earn rewards and level up.
-- **Electric Car Customization:** Dive into tech-driven customization options for your electric ride.
-- **Integrated Tools:** Manage quests with an interactive task manager, challenge yourself with a coin game, use an intuitive math calculator, and record notes quickly with “Some time as Mémo.”
-- **Responsive & Seamless:** Designed for one-screen usability on any device, ensuring a smooth, engaging experience.
+## Install
 
-## Getting Started
+```bash
+git clone https://github.com/kvnbbg/500Discount.git
+cd 500Discount
+npm install
+```
 
-To run the **Tokyo TCG Hub & Star Bazaar** interface locally:
+## Run
 
-1. **Clone** the repository:
-    ```bash
-    git clone https://github.com/kvnbbg/500Discount.git
-    ```
-2. Navigate to the project directory:
-    ```bash
-    cd 500Discount
-    ```
-3. Open the `index.html` file in your browser to launch the application.
+Generate the runtime config (optional, but recommended when you change config values):
 
-## Technologies Used
+```bash
+npm run build
+```
 
-- **HTML** for structuring the webpage.
-- **CSS** for stylish animations and responsive design.
-- **JavaScript** for dynamic interactions and gamified functionalities.
-- (Optional) **Web3.js** for potential blockchain integration and NFT support.
+Start a local static server (modules require a server, not a `file://` URL):
 
-## Folder Structure
+```bash
+python3 -m http.server 5173
+```
 
-- `index.html`: The main HTML file integrating all features.
-- `assets/pictures/`: Directory containing images and assets.
-- *(Additional files such as separate CSS or JS files may be added as needed.)*
+Then open:
+
+```
+http://localhost:5173/index.html
+```
+
+## Configuration
+
+Runtime configuration is stored in `config/app-config.json` and compiled into `assets/js/runtime-config.js` during `npm run build`.
+
+Optional environment overrides (copy `.env.example` → `.env`):
+
+```bash
+APP_AI_INTERVAL_MS=3000
+APP_COIN_GAME_STEP_DELAY_MS=700
+APP_FIRST_RUN_HELP=true
+APP_LOG_LEVEL=info
+```
 
 ## Usage
 
-1. **Customize & Quest:** Use the interface to select your mechanism and UI themes, then embark on quests that challenge you to complete tech-themed tasks for rewards.
-2. **Engage with AI:** Let our dynamic AI loop inspire you with fun facts, quotes, and creative messages.
-3. **Take Quick Notes:** Utilize “Some time as Mémo” to jot down your ideas and keep track of progress.
-4. **Explore Interactive Tools:** Enjoy the coin game challenge, math calculator, and file management features for a fully interactive experience.
+### Command Palette (CLI)
 
-## Credits
+Type commands into the command input field (or use `Alt+R`, `Alt+N`, `Alt+T` shortcuts):
 
-This project was created by **Kvnbbg** as part of the visionary **Tokyo TCG Hub & Star Bazaar** concept—where the future of tech, electric car customization, and trading card excitement collide.
+```text
+help
+reset
+next
+toggle
+magicword
+```
+
+### JavaScript API (Browser Console)
+
+```js
+window.TokyoTCG.resetQuests();
+window.TokyoTCG.validateNextQuest();
+window.TokyoTCG.toggleTheme();
+```
+
+## Troubleshooting
+
+- **Blank page or broken module imports**: Serve the site with a local server (see Run section).
+- **Config changes not reflected**: Re-run `npm run build` to regenerate `assets/js/runtime-config.js`.
+- **Memo saves are missing**: LocalStorage might be disabled or blocked by browser settings.
+
+## Security Notes
+
+- The app runs fully in the browser and stores memo data in LocalStorage only.
+- No user data is transmitted to a backend.
+- The main entrypoint uses a strict Content Security Policy (CSP) to prevent inline script execution.
+- `carCustomization.html` loads Three.js from a public CDN, so only open it when network access is available.
+
+## Project Structure
+
+```
+assets/
+  css/app.css           # Main styles
+  js/                   # App modules and runtime config
+config/app-config.json  # Runtime configuration
+scripts/build.js        # Generates runtime config
+index.html              # Primary UI entrypoint
+carCustomization.html   # Optional 3D demo entrypoint
+```
 
 ## Contributing
 
-Contributions are welcome! Fork the repository and submit a pull request with your enhancements or fixes.
+1. Fork the repo and create your branch: `git checkout -b feat/my-change`.
+2. Install dependencies: `npm install`.
+3. Run checks: `npm run lint` and `npm run test`.
+4. Commit with a clear message and open a pull request.
 
 ## License
 
-This project is licensed under the Mozilla License – see the [LICENSE](LICENSE) file for details.
+Mozilla License. See [LICENSE](LICENSE).
