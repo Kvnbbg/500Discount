@@ -1,0 +1,6 @@
+{
+  "aiMessageIntervalMs": 3000,
+  "coinGameStepDelayMs": 700,
+  "firstRunShowHelp": true,
+  "logLevel": "info"
+}
