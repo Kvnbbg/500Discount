@@ -14,32 +14,49 @@
 </head>
 <body>
   <header>
-    <h1>Tokyo TCG Hub &amp; Star Bazaar</h1>
+    <div class="header-shell">
+      <div>
+        <h1 data-i18n="headerTitle">Tokyo TCG Hub &amp; Star Bazaar</h1>
+        <p class="header-subtitle" data-i18n="headerSubtitle">
+          Retro-futuristic quests, electric car labs, and rally data in one place.
+        </p>
+      </div>
+      <div class="header-actions">
+        <a class="file-btn ghost" href="landing.html" data-i18n="headerLandingLink">Landing</a>
+        <button class="file-btn ghost" id="languageToggle" type="button" aria-live="polite">
+          <span id="languageLabel">EN</span> / FR
+        </button>
+      </div>
+    </div>
   </header>
 
   <div id="ai-loop" aria-live="polite">Kevin Marville: Initializing bazaar...</div>
 
-  <div class="status-banner" id="appStatus" role="status" aria-live="polite">
+  <div class="status-banner" id="appStatus" role="status" aria-live="polite" data-i18n="statusWelcome">
     Welcome back, explorer. Ready to tune your ride and conquer quests.
   </div>
 
   <div class="container">
     <div class="center">
-      <button class="file-btn" data-open-modal="masterModal">Open Control Panel</button>
-      <button class="file-btn" data-open-modal="storyModal">Quick Help</button>
+      <button class="file-btn" data-open-modal="masterModal" data-auth-required="true" data-i18n="openControlPanel">
+        Open Control Panel
+      </button>
+      <button class="file-btn" data-open-modal="storyModal" data-auth-required="true" data-i18n="quickHelp">
+        Quick Help
+      </button>
     </div>
   </div>
 
   <div id="masterModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="masterTitle">
     <div class="modal-content">
-      <h2 id="masterTitle">Master Control Panel</h2>
+      <h2 id="masterTitle" data-i18n="masterControlTitle">Master Control Panel</h2>
       <p>
         Welcome to your interactive magic space! Choose an option to unlock epic quests and tech upgrades:
       </p>
       <button class="file-btn" data-external-link="https://ko-fi.com/kevinmarville">
         Support me on Ko‑fi
       </button>
-      <button class="file-btn" data-external-link="carCustomization.html">
+      <button class="file-btn" data-external-link="carCustomization.html" data-auth-required="true" data-i18n="launchCustomization">
         Launch 3D Car Customization
       </button>
       <br><br>
@@ -49,7 +66,7 @@
 
   <div id="storyModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="storyTitle">
     <div class="modal-content">
-      <h2 id="storyTitle">Welcome to the Quest</h2>
+      <h2 id="storyTitle" data-i18n="storyTitle">Welcome to the Quest</h2>
       <p>
         Embark on epic quests: assemble your card deck, secure tech upgrades, tune your electric ride, and gather battle rewards. Every quest earns you rewards and upgrades!
       </p>
@@ -85,14 +102,14 @@
     </div>
 
     <div class="card">
-      <h1>Welcome to the Bazaar</h1>
-      <p>
+      <h1 data-i18n="welcomeTitle">Welcome to the Bazaar</h1>
+      <p data-i18n-html="welcomeBody">
         At <strong>Tokyo TCG Hub &amp; Star Bazaar</strong>, your journey begins! Customize your electric ride, master futuristic tech, and embark on quests that transform routine tasks into epic adventures.
       </p>
     </div>
 
     <div class="card">
-      <h1>Epic Quests</h1>
+      <h1 data-i18n="questsTitle">Epic Quests</h1>
       <ul id="taskList">
         <li>
           <label>
@@ -179,10 +196,60 @@
     </div>
 
     <div class="card">
-      <h2>Innovative Solutions ❤️</h2>
-      <p>
+      <h2 data-i18n="innovationTitle">Innovative Solutions ❤️</h2>
+      <p data-i18n="innovationBody">
         Experience advanced tech with our futuristic customization tools, interactive challenges, and gamified upgrades that push your electric ride to the next level.
       </p>
+    </div>
+
+    <div class="card auth-card" id="authCard">
+      <div class="auth-header">
+        <h2 data-i18n="authTitle">Join the Family</h2>
+        <span class="status-pill" id="authBadge" data-i18n="authBadgeGuest">Guest</span>
+      </div>
+      <p id="authStatus" data-i18n="authPrompt">
+        Create your secure profile to unlock the control panel and 3D lab.
+      </p>
+      <div class="auth-grid">
+        <form id="registerForm">
+          <h3 data-i18n="registerTitle">Create Account</h3>
+          <label for="registerName" data-i18n="labelName">Name</label>
+          <input id="registerName" type="text" required data-i18n-placeholder="placeholderName" placeholder="Your name">
+          <label for="registerEmail" data-i18n="labelEmail">Email</label>
+          <input id="registerEmail" type="email" required data-i18n-placeholder="placeholderEmail" placeholder="name@example.com">
+          <label for="registerPassword" data-i18n="labelPassword">Password</label>
+          <input id="registerPassword" type="password" required data-i18n-placeholder="placeholderPassword" placeholder="8+ characters">
+          <button class="file-btn" type="submit" data-i18n="registerButton">Register</button>
+        </form>
+        <form id="loginForm">
+          <h3 data-i18n="loginTitle">Sign In</h3>
+          <label for="loginEmail" data-i18n="labelEmail">Email</label>
+          <input id="loginEmail" type="email" required data-i18n-placeholder="placeholderEmail" placeholder="name@example.com">
+          <label for="loginPassword" data-i18n="labelPassword">Password</label>
+          <input id="loginPassword" type="password" required data-i18n-placeholder="placeholderPassword" placeholder="Your password">
+          <button class="file-btn" type="submit" data-i18n="loginButton">Sign In</button>
+        </form>
+      </div>
+      <button class="file-btn ghost" id="logoutBtn" type="button" hidden data-i18n="logoutButton">Sign out</button>
+      <p class="auth-footnote" data-i18n="authFootnote">
+        Local SQL-style vault for now; serverless database coming soon.
+      </p>
+    </div>
+
+    <div class="card" id="evDataCard">
+      <h2 data-i18n="evDataTitle">Electric Car Intelligence</h2>
+      <p data-i18n="evDataSubtitle">
+        Curated specs from leading EV makers, tuned for quick comparison.
+      </p>
+      <div id="evDataGrid" class="data-grid" aria-live="polite"></div>
+    </div>
+
+    <div class="card" id="rallyCard">
+      <h2 data-i18n="rallyTitle">Rally Signal (2024/2025)</h2>
+      <p data-i18n="rallySubtitle">
+        Latest rally highlights and series you can follow right now.
+      </p>
+      <div id="rallyList" class="rally-grid" aria-live="polite"></div>
     </div>
 
     <div class="card" id="coinGameCard">
@@ -228,7 +295,12 @@
         • <strong>Alt+T</strong>: Toggle theme<br>
         Or type a command below (try <code>help</code>):
       </p>
-      <input type="text" id="commandInput" placeholder="Type 'reset', 'next', 'toggle', or '--help'">
+      <input
+        type="text"
+        id="commandInput"
+        data-i18n-placeholder="commandPlaceholder"
+        placeholder="Type 'reset', 'next', 'toggle', or '--help'"
+      >
       <div id="commandOutput" class="command-output" role="status" aria-live="polite"></div>
     </div>
 

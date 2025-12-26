@@ -12,13 +12,142 @@ import { readStorageValue, writeStorageValue } from './utils/storage.js';
 const config = getAppConfig();
 const logger = createLogger(config.logLevel);
 
-const aiMessages = [
-  'AI: Did you know? Electric cars can accelerate from 0-60 in under 3 seconds.',
-  'AI: Giveaway: Enter now for a chance to win bonus points!',
-  "AI: Quote: 'The future is electric and full of surprises.'",
-  'AI: Imagine a neon skyline where every card tells a unique story.',
-  'AI: Fact: Cutting-edge tech drives innovation in every duel.',
-];
+const supportedLanguages = ['en', 'fr'];
+let currentLanguage = readStorageValue('language', 'en');
+
+const translations = {
+  en: {
+    headerTitle: 'Tokyo TCG Hub & Star Bazaar',
+    headerSubtitle: 'Retro-futuristic quests, electric car labs, and rally data in one place.',
+    headerLandingLink: 'Landing',
+    statusWelcome: 'Welcome back, explorer. Ready to tune your ride and conquer quests.',
+    openControlPanel: 'Open Control Panel',
+    quickHelp: 'Quick Help',
+    masterControlTitle: 'Master Control Panel',
+    launchCustomization: 'Launch 3D Car Customization',
+    storyTitle: 'Welcome to the Quest',
+    welcomeTitle: 'Welcome to the Bazaar',
+    welcomeBody:
+      'At <strong>Tokyo TCG Hub &amp; Star Bazaar</strong>, your journey begins! Customize your electric ride, master futuristic tech, and embark on quests that transform routine tasks into epic adventures.',
+    questsTitle: 'Epic Quests',
+    innovationTitle: 'Innovative Solutions ❤️',
+    innovationBody:
+      'Experience advanced tech with our futuristic customization tools, interactive challenges, and gamified upgrades that push your electric ride to the next level.',
+    authTitle: 'Join the Family',
+    authBadgeGuest: 'Guest',
+    authBadgeMember: 'Member',
+    authPrompt: 'Create your secure profile to unlock the control panel and 3D lab.',
+    registerTitle: 'Create Account',
+    loginTitle: 'Sign In',
+    labelName: 'Name',
+    labelEmail: 'Email',
+    labelPassword: 'Password',
+    placeholderName: 'Your name',
+    placeholderEmail: 'name@example.com',
+    placeholderPassword: '8+ characters',
+    registerButton: 'Register',
+    loginButton: 'Sign In',
+    logoutButton: 'Sign out',
+    authFootnote: 'Local SQL-style vault for now; serverless database coming soon.',
+    authWelcome: 'Welcome back',
+    authRegisterSuccess: 'Registration complete. You are now signed in.',
+    authRegisterExists: 'An account with that email already exists.',
+    authLoginInvalid: 'Login failed. Check your email and password.',
+    authLoginSuccess: 'Signed in successfully.',
+    authLogout: 'Signed out. See you soon!',
+    authUnlockTooltip: 'Register or sign in to unlock this feature.',
+    evDataTitle: 'Electric Car Intelligence',
+    evDataSubtitle: 'Curated specs from leading EV makers, tuned for quick comparison.',
+    rallyTitle: 'Rally Signal (2024/2025)',
+    rallySubtitle: 'Latest rally highlights and series you can follow right now.',
+    evRange: 'Range',
+    evPower: 'Power',
+    evZeroToHundred: '0-100 km/h',
+    evTopSpeed: 'Top speed',
+    evNote: 'Note',
+    rallySeries: 'Series',
+    rallyHighlight: 'Highlight',
+    rallyWindow: 'Window',
+    commandPlaceholder: "Type 'reset', 'next', 'toggle', or '--help'",
+  },
+  fr: {
+    headerTitle: 'Tokyo TCG Hub & Star Bazaar',
+    headerSubtitle: 'Quêtes rétro-futuristes, labos EV et données rallye réunis.',
+    headerLandingLink: 'Accueil',
+    statusWelcome: 'Bon retour, explorateur. Prêt à régler ton bolide et réussir les quêtes.',
+    openControlPanel: 'Ouvrir le panneau',
+    quickHelp: 'Aide rapide',
+    masterControlTitle: 'Panneau de contrôle',
+    launchCustomization: 'Lancer la customisation 3D',
+    storyTitle: 'Bienvenue dans la quête',
+    welcomeTitle: 'Bienvenue au Bazaar',
+    welcomeBody:
+      'Chez <strong>Tokyo TCG Hub &amp; Star Bazaar</strong>, l’aventure commence ici ! Personnalise ton véhicule électrique, maîtrise la tech futuriste et transforme tes tâches en quêtes épiques.',
+    questsTitle: 'Quêtes épiques',
+    innovationTitle: 'Solutions innovantes ❤️',
+    innovationBody:
+      "Découvre des outils de customisation futuristes, des défis interactifs et des améliorations gamifiées pour propulser ton bolide au niveau supérieur.",
+    authTitle: 'Rejoins la famille',
+    authBadgeGuest: 'Visiteur',
+    authBadgeMember: 'Membre',
+    authPrompt: 'Crée un profil sécurisé pour accéder au panneau et au labo 3D.',
+    registerTitle: 'Créer un compte',
+    loginTitle: 'Connexion',
+    labelName: 'Nom',
+    labelEmail: 'Email',
+    labelPassword: 'Mot de passe',
+    placeholderName: 'Ton nom',
+    placeholderEmail: 'nom@exemple.com',
+    placeholderPassword: '8+ caractères',
+    registerButton: "S'inscrire",
+    loginButton: 'Se connecter',
+    logoutButton: 'Se déconnecter',
+    authFootnote: 'Base locale type SQL pour l’instant; base serverless bientôt.',
+    authWelcome: 'Bon retour',
+    authRegisterSuccess: 'Inscription réussie. Vous êtes connecté.',
+    authRegisterExists: 'Un compte avec cet email existe déjà.',
+    authLoginInvalid: 'Connexion échouée. Vérifiez vos identifiants.',
+    authLoginSuccess: 'Connexion réussie.',
+    authLogout: 'Déconnecté. À bientôt !',
+    authUnlockTooltip: 'Inscrivez-vous ou connectez-vous pour déverrouiller cette fonction.',
+    evDataTitle: 'Intelligence voitures électriques',
+    evDataSubtitle: 'Données clés des leaders EV pour comparer rapidement.',
+    rallyTitle: 'Signal Rallye (2024/2025)',
+    rallySubtitle: 'Points forts rallye récents et séries à suivre.',
+    evRange: 'Autonomie',
+    evPower: 'Puissance',
+    evZeroToHundred: '0-100 km/h',
+    evTopSpeed: 'Vitesse max',
+    evNote: 'Note',
+    rallySeries: 'Série',
+    rallyHighlight: 'Point fort',
+    rallyWindow: 'Période',
+    commandPlaceholder: "Tapez 'reset', 'next', 'toggle' ou '--help'",
+  },
+};
+
+const getAiMessages = (lang) => {
+  if (lang === 'fr') {
+    return [
+      "IA : Le couple instantané des EV booste les départs.",
+      "IA : Bonus du jour — vise les quêtes rapides pour des points.",
+      "IA : Citation : « Le futur est électrique et surprenant. »",
+      "IA : Imagine une skyline néon où chaque carte raconte une histoire.",
+      "IA : Fait : l'innovation électrique accélère chaque duel.",
+    ];
+  }
+
+  return [
+    'AI: Did you know? Electric cars can accelerate from 0-60 in under 3 seconds.',
+    'AI: Giveaway: Enter now for a chance to win bonus points!',
+    "AI: Quote: 'The future is electric and full of surprises.'",
+    'AI: Imagine a neon skyline where every card tells a unique story.',
+    'AI: Fact: Cutting-edge tech drives innovation in every duel.',
+  ];
+};
+
+const getTranslation = (lang, key) =>
+  (translations[lang] && translations[lang][key]) || translations.en[key] || key;
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -28,7 +157,7 @@ const setStatusMessage = (element, message) => {
   }
 };
 
-const initAiLoop = (aiLoopElement) => {
+const initAiLoop = (aiLoopElement, getMessages) => {
   if (!aiLoopElement) {
     return;
   }
@@ -36,6 +165,7 @@ const initAiLoop = (aiLoopElement) => {
   let aiIndex = 0;
 
   const updateAiMessage = () => {
+    const aiMessages = getMessages();
     aiLoopElement.classList.add('fade');
     setTimeout(() => {
       aiLoopElement.textContent = aiMessages[aiIndex];
@@ -46,6 +176,347 @@ const initAiLoop = (aiLoopElement) => {
 
   aiLoopElement.addEventListener('click', updateAiMessage);
   setInterval(updateAiMessage, config.aiMessageIntervalMs);
+};
+
+const applyTranslations = (lang) => {
+  document.documentElement.lang = lang;
+
+  document.querySelectorAll('[data-i18n]').forEach((el) => {
+    const key = el.dataset.i18n;
+    el.textContent = getTranslation(lang, key);
+  });
+
+  document.querySelectorAll('[data-i18n-html]').forEach((el) => {
+    const key = el.dataset.i18nHtml;
+    el.innerHTML = getTranslation(lang, key);
+  });
+
+  document.querySelectorAll('[data-i18n-placeholder]').forEach((el) => {
+    const key = el.dataset.i18nPlaceholder;
+    el.setAttribute('placeholder', getTranslation(lang, key));
+  });
+};
+
+const evData = [
+  {
+    model: 'Tesla Model 3 Performance',
+    range: '547 km (WLTP)',
+    power: '375 kW',
+    zeroToHundred: '3.1 s',
+    topSpeed: '262 km/h',
+    note: 'Dual-motor performance trim.',
+  },
+  {
+    model: 'Toyota bZ4X',
+    range: '452 km (WLTP)',
+    power: '160 kW',
+    zeroToHundred: '7.5 s',
+    topSpeed: '160 km/h',
+    note: 'AWD EU spec.',
+  },
+  {
+    model: 'Hyundai Ioniq 5 N',
+    range: '448 km (WLTP)',
+    power: '478 kW',
+    zeroToHundred: '3.4 s',
+    topSpeed: '260 km/h',
+    note: 'N Mode boosted output.',
+  },
+  {
+    model: 'Porsche Taycan Turbo',
+    range: '510 km (WLTP)',
+    power: '500 kW',
+    zeroToHundred: '2.9 s',
+    topSpeed: '260 km/h',
+    note: 'Performance battery plus.',
+  },
+  {
+    model: 'Ford Mustang Mach-E GT',
+    range: '490 km (WLTP)',
+    power: '358 kW',
+    zeroToHundred: '3.8 s',
+    topSpeed: '200 km/h',
+    note: 'Extended range battery.',
+  },
+  {
+    model: 'Citroën ë-C4 X',
+    range: '360 km (WLTP)',
+    power: '100 kW',
+    zeroToHundred: '9.7 s',
+    topSpeed: '150 km/h',
+    note: 'Comfort-focused sedan.',
+  },
+  {
+    model: 'Opel Corsa Electric',
+    range: '405 km (WLTP)',
+    power: '115 kW',
+    zeroToHundred: '8.1 s',
+    topSpeed: '150 km/h',
+    note: 'Urban EV benchmark.',
+  },
+  {
+    model: 'Ferrari SF90 Stradale',
+    range: '25 km (EV)',
+    power: '735 kW',
+    zeroToHundred: '2.5 s',
+    topSpeed: '340 km/h',
+    note: 'Plug-in hybrid hypercar.',
+  },
+];
+
+const rallyData = [
+  {
+    series: 'WRC',
+    highlight: 'Hybrid era stages across Europe, Africa, and Asia.',
+    window: 'Jan–Nov 2024/2025',
+  },
+  {
+    series: 'Dakar Rally',
+    highlight: 'Rally-raid endurance in desert terrain.',
+    window: 'Jan 2025',
+  },
+  {
+    series: 'ERC',
+    highlight: 'European tarmac + gravel mix with new talents.',
+    window: 'Apr–Oct 2024',
+  },
+  {
+    series: 'Extreme E',
+    highlight: 'Electric off-road battle in climate-challenged locations.',
+    window: '2024 season',
+  },
+];
+
+const renderEvData = (container, lang) => {
+  if (!container) {
+    return;
+  }
+
+  container.innerHTML = '';
+
+  evData.forEach((car) => {
+    const card = document.createElement('article');
+    card.className = 'data-card';
+
+    const title = document.createElement('h3');
+    title.textContent = car.model;
+
+    const meta = document.createElement('div');
+    meta.className = 'data-meta';
+    meta.innerHTML = `
+      <div><strong>${getTranslation(lang, 'evRange')}:</strong> ${car.range}</div>
+      <div><strong>${getTranslation(lang, 'evPower')}:</strong> ${car.power}</div>
+      <div><strong>${getTranslation(lang, 'evZeroToHundred')}:</strong> ${car.zeroToHundred}</div>
+      <div><strong>${getTranslation(lang, 'evTopSpeed')}:</strong> ${car.topSpeed}</div>
+    `;
+
+    const note = document.createElement('p');
+    note.className = 'data-meta';
+    note.innerHTML = `<strong>${getTranslation(lang, 'evNote')}:</strong> ${car.note}`;
+
+    card.append(title, meta, note);
+    container.appendChild(card);
+  });
+};
+
+const renderRallyData = (container, lang) => {
+  if (!container) {
+    return;
+  }
+
+  container.innerHTML = '';
+
+  rallyData.forEach((event) => {
+    const card = document.createElement('article');
+    card.className = 'rally-card';
+
+    const title = document.createElement('h3');
+    title.textContent = event.series;
+
+    const highlight = document.createElement('div');
+    highlight.className = 'data-meta';
+    highlight.innerHTML = `<strong>${getTranslation(lang, 'rallyHighlight')}:</strong> ${event.highlight}`;
+
+    const window = document.createElement('div');
+    window.className = 'data-meta';
+    window.innerHTML = `<strong>${getTranslation(lang, 'rallyWindow')}:</strong> ${event.window}`;
+
+    card.append(title, highlight, window);
+    container.appendChild(card);
+  });
+};
+
+const initLanguageToggle = ({
+  languageToggle,
+  languageLabel,
+  evDataGrid,
+  rallyList,
+  onLanguageChange,
+}) => {
+  if (!languageToggle || !languageLabel) {
+    return { applyLanguage: () => {} };
+  }
+
+  const applyLanguage = (lang) => {
+    currentLanguage = supportedLanguages.includes(lang) ? lang : 'en';
+    writeStorageValue('language', currentLanguage);
+    languageLabel.textContent = currentLanguage.toUpperCase();
+    applyTranslations(currentLanguage);
+    renderEvData(evDataGrid, currentLanguage);
+    renderRallyData(rallyList, currentLanguage);
+    if (onLanguageChange) {
+      onLanguageChange(currentLanguage);
+    }
+  };
+
+  languageToggle.addEventListener('click', () => {
+    const nextLanguage = currentLanguage === 'en' ? 'fr' : 'en';
+    applyLanguage(nextLanguage);
+  });
+
+  applyLanguage(currentLanguage);
+  return { applyLanguage };
+};
+
+const initAuth = async ({ authStatus, authBadge, logoutBtn, registerForm, loginForm, gatedButtons }) => {
+  if (!authStatus || !authBadge || !logoutBtn || !registerForm || !loginForm) {
+    return () => {};
+  }
+
+  const readUsers = () => {
+    const raw = readStorageValue('authUsers', '[]');
+    try {
+      return JSON.parse(raw);
+    } catch (error) {
+      return [];
+    }
+  };
+
+  const writeUsers = (users) => {
+    writeStorageValue('authUsers', JSON.stringify(users));
+  };
+
+  const hashPassword = async (password) => {
+    if (crypto?.subtle) {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(password);
+      const hash = await crypto.subtle.digest('SHA-256', data);
+      return Array.from(new Uint8Array(hash))
+        .map((byte) => byte.toString(16).padStart(2, '0'))
+        .join('');
+    }
+
+    return btoa(password).split('').reverse().join('');
+  };
+
+  const getSession = () => {
+    const raw = readStorageValue('authSession', '');
+    if (!raw) {
+      return null;
+    }
+    try {
+      return JSON.parse(raw);
+    } catch (error) {
+      return null;
+    }
+  };
+
+  const setSession = (session) => {
+    writeStorageValue('authSession', JSON.stringify(session));
+  };
+
+  const clearSession = () => {
+    writeStorageValue('authSession', '');
+  };
+
+  const updateGatedButtons = (isAuthenticated) => {
+    gatedButtons.forEach((button) => {
+      button.disabled = !isAuthenticated;
+      button.setAttribute('aria-disabled', String(!isAuthenticated));
+      button.title = isAuthenticated
+        ? ''
+        : getTranslation(currentLanguage, 'authUnlockTooltip');
+    });
+  };
+
+  const applyAuthState = (session, messageKey) => {
+    const isAuthenticated = Boolean(session);
+    authBadge.textContent = getTranslation(
+      currentLanguage,
+      isAuthenticated ? 'authBadgeMember' : 'authBadgeGuest'
+    );
+    authStatus.textContent = isAuthenticated
+      ? `${getTranslation(currentLanguage, 'authWelcome')}, ${session.name}.`
+      : getTranslation(currentLanguage, 'authPrompt');
+    registerForm.hidden = isAuthenticated;
+    loginForm.hidden = isAuthenticated;
+    logoutBtn.hidden = !isAuthenticated;
+    updateGatedButtons(isAuthenticated);
+
+    if (messageKey) {
+      authStatus.textContent = getTranslation(currentLanguage, messageKey);
+    }
+  };
+
+  registerForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const name = registerForm.querySelector('#registerName')?.value.trim();
+    const email = registerForm.querySelector('#registerEmail')?.value.trim().toLowerCase();
+    const password = registerForm.querySelector('#registerPassword')?.value;
+
+    if (!name || !email || !password) {
+      return;
+    }
+
+    const users = readUsers();
+    const exists = users.find((user) => user.email === email);
+    if (exists) {
+      applyAuthState(null, 'authRegisterExists');
+      return;
+    }
+
+    const passwordHash = await hashPassword(password);
+    users.push({ name, email, passwordHash, createdAt: new Date().toISOString() });
+    writeUsers(users);
+    setSession({ name, email, signedInAt: new Date().toISOString() });
+    applyAuthState(getSession(), 'authRegisterSuccess');
+    registerForm.reset();
+  });
+
+  loginForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const email = loginForm.querySelector('#loginEmail')?.value.trim().toLowerCase();
+    const password = loginForm.querySelector('#loginPassword')?.value;
+
+    const users = readUsers();
+    const user = users.find((entry) => entry.email === email);
+    if (!user) {
+      applyAuthState(null, 'authLoginInvalid');
+      return;
+    }
+
+    const passwordHash = await hashPassword(password);
+    if (passwordHash !== user.passwordHash) {
+      applyAuthState(null, 'authLoginInvalid');
+      return;
+    }
+
+    setSession({ name: user.name, email: user.email, signedInAt: new Date().toISOString() });
+    applyAuthState(getSession(), 'authLoginSuccess');
+    loginForm.reset();
+  });
+
+  logoutBtn.addEventListener('click', () => {
+    clearSession();
+    applyAuthState(null, 'authLogout');
+  });
+
+  const refreshAuthState = () => {
+    applyAuthState(getSession());
+  };
+
+  refreshAuthState();
+  return refreshAuthState;
 };
 
 const initQuests = ({ checkboxes, progressBar, scoreDisplay }) => {
@@ -551,7 +1022,7 @@ const initCardAnimation = () => {
   requestAnimationFrame(animateCards);
 };
 
-const initApp = () => {
+const initApp = async () => {
   const aiLoopElement = document.getElementById('ai-loop');
   const progressBar = document.getElementById('progressBar');
   const resetBtn = document.getElementById('resetBtn');
@@ -571,6 +1042,16 @@ const initApp = () => {
   const fileLog = document.getElementById('fileLog');
   const toggleTheme = () => document.body.classList.toggle('valentine-theme');
   const easterModal = document.getElementById('easterModal');
+  const languageToggle = document.getElementById('languageToggle');
+  const languageLabel = document.getElementById('languageLabel');
+  const evDataGrid = document.getElementById('evDataGrid');
+  const rallyList = document.getElementById('rallyList');
+  const authStatus = document.getElementById('authStatus');
+  const authBadge = document.getElementById('authBadge');
+  const logoutBtn = document.getElementById('logoutBtn');
+  const registerForm = document.getElementById('registerForm');
+  const loginForm = document.getElementById('loginForm');
+  const gatedButtons = document.querySelectorAll('[data-auth-required="true"]');
 
   const { resetTasks, validateNextTask, addScore } = initQuests({
     checkboxes: document.querySelectorAll('.task-checkbox'),
@@ -585,7 +1066,22 @@ const initApp = () => {
     }
   };
 
-  initAiLoop(aiLoopElement);
+  const refreshAuthState = await initAuth({
+    authStatus,
+    authBadge,
+    logoutBtn,
+    registerForm,
+    loginForm,
+    gatedButtons,
+  });
+  initLanguageToggle({
+    languageToggle,
+    languageLabel,
+    evDataGrid,
+    rallyList,
+    onLanguageChange: refreshAuthState,
+  });
+  initAiLoop(aiLoopElement, () => getAiMessages(currentLanguage));
   initMathCalculator({ mathInput, calcBtn, mathResult });
   initCoinGame({
     startCoinGameBtn,
@@ -630,14 +1126,12 @@ const initApp = () => {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-  try {
-    initApp();
-  } catch (error) {
+  initApp().catch((error) => {
     handleError({
       error,
       logger,
       userMessage: 'Unable to start the experience. Please refresh the page.',
       statusElement: document.getElementById('appStatus'),
     });
-  }
+  });
 });
