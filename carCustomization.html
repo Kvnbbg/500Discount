@@ -19,12 +19,29 @@
       background-color: rgba(255, 255, 255, 0.8);
       z-index: 10;
       border-bottom-right-radius: 12px;
+      max-width: 320px;
     }
 
     .controls button {
       display: block;
       margin-top: 10px;
       font-size: 16px;
+    }
+
+    .controls .control-row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .controls .pill {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.1);
+      font-size: 0.75rem;
+      margin-top: 6px;
     }
 
     #game-area {
@@ -38,12 +55,24 @@
 <body>
   <section id="controls" aria-label="Vehicle controls">
     <h2>🕹️ Controls</h2>
+    <p class="pill">Grab + drag to rotate. Toggle auto-loop for showcase.</p>
     <h4>🛻 Control Your Vehicle</h4>
     <div class="controls">
-      <button id="left-btn">⬅️ Left</button>
-      <button id="right-btn">➡️ Right</button>
-      <button id="up-btn">⬆️ Accelerate</button>
-      <button id="stop-btn">🛑 Stop</button>
+      <div class="control-row">
+        <button id="left-btn">⬅️ Left</button>
+        <button id="right-btn">➡️ Right</button>
+        <button id="up-btn">⬆️ Accelerate</button>
+        <button id="stop-btn">🛑 Stop</button>
+      </div>
+      <h4>🎨 Custom Tools</h4>
+      <div class="control-row">
+        <button id="paint-btn">🎨 Paint</button>
+        <button id="lights-btn">💡 Lights</button>
+        <button id="spoiler-btn">🪶 Spoiler</button>
+        <button id="loop-btn">🔁 Auto Loop</button>
+      </div>
+      <button id="reset-btn">♻️ Reset Position</button>
+      <p class="pill">Parts: body, cabin, spoiler, lights, wheels.</p>
     </div>
   </section>
 
@@ -62,6 +91,7 @@
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.shadowMap.enabled = true;
+    renderer.outputEncoding = THREE.sRGBEncoding;
     document.body.appendChild(renderer.domElement);
 
     // Add lighting
@@ -73,16 +103,54 @@
     const ambientLight = new THREE.AmbientLight(0x404040); // Soft lighting for shadows
     scene.add(ambientLight);
 
-    // Car Geometry: Using Phong material for more realistic lighting effects
-    const carGeometry = new THREE.BoxGeometry(2, 0.5, 1); // Car body
-    const carMaterial = new THREE.MeshPhongMaterial({ color: 0x0077ff, shininess: 100 });
+    const carGroup = new THREE.Group();
+    scene.add(carGroup);
+
+    // Car Geometry: Using Standard material for more realistic lighting effects
+    const paints = [0x0077ff, 0xff3366, 0x14c38e, 0xffc300];
+    let paintIndex = 0;
+    const carMaterial = new THREE.MeshStandardMaterial({
+      color: paints[paintIndex],
+      metalness: 0.5,
+      roughness: 0.35,
+    });
+    const carGeometry = new THREE.BoxGeometry(2, 0.5, 1);
     const car = new THREE.Mesh(carGeometry, carMaterial);
     car.castShadow = true;
-    scene.add(car);
+    carGroup.add(car);
+
+    const cabinGeometry = new THREE.BoxGeometry(1.1, 0.45, 0.9);
+    const cabinMaterial = new THREE.MeshStandardMaterial({
+      color: 0x222831,
+      metalness: 0.2,
+      roughness: 0.5,
+    });
+    const cabin = new THREE.Mesh(cabinGeometry, cabinMaterial);
+    cabin.position.set(-0.1, 0.45, 0);
+    cabin.castShadow = true;
+    carGroup.add(cabin);
+
+    const spoilerGeometry = new THREE.BoxGeometry(0.7, 0.1, 0.35);
+    const spoiler = new THREE.Mesh(spoilerGeometry, carMaterial);
+    spoiler.position.set(-0.9, 0.35, 0);
+    spoiler.castShadow = true;
+    carGroup.add(spoiler);
+
+    const lightGeometry = new THREE.BoxGeometry(0.12, 0.12, 0.2);
+    const lightMaterial = new THREE.MeshStandardMaterial({
+      color: 0xfff3c2,
+      emissive: 0xfff3c2,
+      emissiveIntensity: 0.7,
+    });
+    const leftLight = new THREE.Mesh(lightGeometry, lightMaterial);
+    const rightLight = new THREE.Mesh(lightGeometry, lightMaterial);
+    leftLight.position.set(1.05, 0.05, 0.35);
+    rightLight.position.set(1.05, 0.05, -0.35);
+    carGroup.add(leftLight, rightLight);
 
     // Create wheels using better material
-    const wheelGeometry = new THREE.CylinderGeometry(0.2, 0.2, 0.1, 32);
-    const wheelMaterial = new THREE.MeshPhongMaterial({ color: 0x333333 });
+    const wheelGeometry = new THREE.CylinderGeometry(0.2, 0.2, 0.12, 32);
+    const wheelMaterial = new THREE.MeshStandardMaterial({ color: 0x1d1d1d, roughness: 0.6 });
 
     const wheel1 = new THREE.Mesh(wheelGeometry, wheelMaterial);
     const wheel2 = new THREE.Mesh(wheelGeometry, wheelMaterial);
@@ -104,7 +172,7 @@
     wheel3.castShadow = true;
     wheel4.castShadow = true;
 
-    scene.add(wheel1, wheel2, wheel3, wheel4);
+    carGroup.add(wheel1, wheel2, wheel3, wheel4);
 
     // Ground plane for the car to cast shadows on
     const groundGeometry = new THREE.PlaneGeometry(50, 50);
@@ -124,6 +192,11 @@
     const maxSpeed = 0.1;
     const acceleration = 0.002;
     const deceleration = 0.001;
+    let autoLoop = false;
+    let isDragging = false;
+    let lastX = 0;
+    let lightsOn = true;
+    let spoilerOn = true;
 
     // Button controls for speed and direction
     document.getElementById('left-btn').addEventListener('click', () => {
@@ -144,27 +217,75 @@
       carSpeed = 0;
     });
 
-    // Smooth mouse-based movement
-    document.addEventListener('mousemove', (event) => {
-      const mouseX = (event.clientX / window.innerWidth) * 2 - 1;
-      const mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+    document.getElementById('paint-btn').addEventListener('click', () => {
+      paintIndex = (paintIndex + 1) % paints.length;
+      carMaterial.color.setHex(paints[paintIndex]);
+    });
 
-      car.position.x = THREE.MathUtils.lerp(car.position.x, mouseX * 3, 0.1);
-      car.position.y = THREE.MathUtils.lerp(car.position.y, mouseY, 0.1);
+    document.getElementById('lights-btn').addEventListener('click', () => {
+      lightsOn = !lightsOn;
+      lightMaterial.emissiveIntensity = lightsOn ? 0.7 : 0.0;
+    });
+
+    document.getElementById('spoiler-btn').addEventListener('click', () => {
+      spoilerOn = !spoilerOn;
+      spoiler.visible = spoilerOn;
+    });
+
+    document.getElementById('loop-btn').addEventListener('click', () => {
+      autoLoop = !autoLoop;
+    });
+
+    document.getElementById('reset-btn').addEventListener('click', () => {
+      carGroup.position.set(0, 0, 0);
+      carGroup.rotation.set(0, 0, 0);
+      carRotation = 0;
+      carSpeed = 0;
+    });
+
+    renderer.domElement.addEventListener('mousedown', (event) => {
+      isDragging = true;
+      lastX = event.clientX;
+    });
+
+    window.addEventListener('mouseup', () => {
+      isDragging = false;
+    });
+
+    window.addEventListener('mousemove', (event) => {
+      if (!isDragging) {
+        return;
+      }
+      const deltaX = event.clientX - lastX;
+      lastX = event.clientX;
+      carRotation += deltaX * 0.005;
     });
 
     // Update loop with smooth movement and realistic car behavior
     function animate() {
       requestAnimationFrame(animate);
 
-      // Smooth car rotation
-      car.rotation.y = THREE.MathUtils.lerp(car.rotation.y, carRotation, 0.1);
+      const spinFactor = carSpeed * 25;
+      wheel1.rotation.x -= spinFactor;
+      wheel2.rotation.x -= spinFactor;
+      wheel3.rotation.x -= spinFactor;
+      wheel4.rotation.x -= spinFactor;
 
-      // Smooth acceleration and deceleration
-      car.position.z -= carSpeed;
+      if (autoLoop) {
+        const time = performance.now() * 0.0005;
+        carGroup.position.x = Math.cos(time) * 3;
+        carGroup.position.z = Math.sin(time) * 3;
+        carGroup.rotation.y = -time;
+      } else {
+        // Smooth car rotation
+        carGroup.rotation.y = THREE.MathUtils.lerp(carGroup.rotation.y, carRotation, 0.1);
 
-      if (carSpeed > 0) {
-        carSpeed -= deceleration; // Gradual deceleration
+        // Smooth acceleration and deceleration
+        carGroup.position.z -= carSpeed;
+
+        if (carSpeed > 0) {
+          carSpeed -= deceleration; // Gradual deceleration
+        }
       }
 
       // Render the scene

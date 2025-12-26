@@ -93,6 +93,26 @@ header h1 {
   animation: textPulse 2s infinite;
 }
 
+.header-shell {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.header-subtitle {
+  margin-top: 10px;
+  font-size: 0.9rem;
+  color: rgba(224, 224, 224, 0.75);
+}
+
+.header-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
 @keyframes textPulse {
   0% {
     transform: scale(1);
@@ -146,6 +166,104 @@ a:hover {
   padding: 20px;
   margin-bottom: 20px;
   transition: background-color var(--transition-speed);
+}
+
+.auth-card {
+  border: 1px solid rgba(255, 204, 0, 0.4);
+}
+
+.auth-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.auth-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  margin-top: 16px;
+}
+
+.auth-grid form {
+  display: grid;
+  gap: 10px;
+}
+
+.auth-grid input {
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  background-color: rgba(0, 0, 0, 0.4);
+  color: var(--text-color);
+}
+
+.auth-footnote {
+  margin-top: 12px;
+  font-size: 0.8rem;
+  color: rgba(224, 224, 224, 0.7);
+}
+
+.status-pill {
+  background: rgba(255, 204, 0, 0.2);
+  border: 1px solid rgba(255, 204, 0, 0.4);
+  color: var(--highlight-color);
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+}
+
+.file-btn[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.data-grid,
+.rally-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  margin-top: 16px;
+}
+
+.data-card,
+.rally-card {
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 204, 0, 0.2);
+  border-radius: 10px;
+  padding: 14px;
+  display: grid;
+  gap: 8px;
+}
+
+.data-card h3,
+.rally-card h3 {
+  font-size: 1rem;
+  color: var(--highlight-color);
+}
+
+.data-meta {
+  font-size: 0.85rem;
+  color: rgba(224, 224, 224, 0.75);
+}
+
+.landing-hero {
+  text-align: center;
+}
+
+.landing-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+.landing-grid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
 }
 
 .progress-container {
@@ -240,6 +358,12 @@ input[type='checkbox'] {
   border-radius: var(--border-radius);
   cursor: pointer;
   transition: background var(--transition-speed);
+}
+
+.file-btn.ghost {
+  background: transparent;
+  color: var(--highlight-color);
+  border: 1px solid var(--highlight-color);
 }
 
 .file-btn:hover {
