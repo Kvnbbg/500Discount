@@ -396,17 +396,28 @@ const initAuth = async ({ authStatus, authBadge, logoutBtn, registerForm, loginF
     writeStorageValue('authUsers', JSON.stringify(users));
   };
 
+  const base64Encode = (value) => {
+    const encoder = new TextEncoder();
+    const bytes = encoder.encode(value);
+    let binary = '';
+    bytes.forEach((byte) => {
+      binary += String.fromCharCode(byte);
+    });
+    return btoa(binary);
+  };
+
   const hashPassword = async (password) => {
-    if (crypto?.subtle) {
+    const cryptoApi = globalThis.crypto;
+    if (cryptoApi?.subtle) {
       const encoder = new TextEncoder();
       const data = encoder.encode(password);
-      const hash = await crypto.subtle.digest('SHA-256', data);
+      const hash = await cryptoApi.subtle.digest('SHA-256', data);
       return Array.from(new Uint8Array(hash))
         .map((byte) => byte.toString(16).padStart(2, '0'))
         .join('');
     }
 
-    return btoa(password).split('').reverse().join('');
+    return base64Encode(password).split('').reverse().join('');
   };
 
   const getSession = () => {
@@ -949,6 +960,23 @@ const initModals = () => {
   });
 };
 
+const isSafeExternalUrl = (url) => {
+  if (typeof url !== 'string' || url.trim().length === 0) {
+    return false;
+  }
+
+  if (url.startsWith('/')) {
+    return true;
+  }
+
+  try {
+    const parsed = new URL(url, window.location.href);
+    return ['http:', 'https:'].includes(parsed.protocol);
+  } catch (error) {
+    return false;
+  }
+};
+
 const initExternalLinks = () => {
   const externalButtons = document.querySelectorAll('[data-external-link]');
   if (!externalButtons.length) {
@@ -958,8 +986,10 @@ const initExternalLinks = () => {
   externalButtons.forEach((button) => {
     button.addEventListener('click', () => {
       const url = button.dataset.externalLink;
-      if (url) {
+      if (url && isSafeExternalUrl(url)) {
         window.open(url, '_blank', 'noopener,noreferrer');
+      } else {
+        logger.warn('Blocked unsafe external link attempt.', { url });
       }
     });
   });
