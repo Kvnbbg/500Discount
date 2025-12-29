@@ -68,6 +68,25 @@ const translations = {
     rallySeries: 'Series',
     rallyHighlight: 'Highlight',
     rallyWindow: 'Window',
+    vercelTitle: 'Vercel-ready Car Templates',
+    vercelIntro:
+      'Vanilla JS car templates deploy as static sites on Vercel—just HTML, CSS, and JS files with no build step.',
+    templateCanvasTitle: 'Canvas Car Racer',
+    templateCanvasBody: 'Pure Canvas driving sim with sprite swaps for city or campaign branding.',
+    templateThreeTitle: 'Three.js Car Viewer',
+    templateThreeBody: 'Lightweight GLTF loader with orbit controls for interactive 3D showcases.',
+    templateSvgTitle: 'SVG Car Animator',
+    templateSvgBody: 'Minimal SVG path animation for 2D top-down routes and fleet tracking.',
+    vercelStepsTitle: 'Deploy to Vercel in Minutes',
+    vercelStepOne:
+      'Create an index.html with scripts, add style.css, and keep assets in the repo root.',
+    vercelStepTwo:
+      'Optional: add vercel.json to rewrite all routes to index.html.',
+    vercelStepThree: 'Push to GitHub and import the repo in Vercel for instant static deploys.',
+    vercelTipsTitle: 'Quick Customization Tips',
+    vercelTipOne: 'Swap in free GLTF cars (Sketchfab) and adjust materials for city lighting.',
+    vercelTipTwo: 'Overlay campaign stats and delivery milestones directly on the HUD.',
+    vercelTipThree: 'Test locally with npx serve, then push to redeploy.',
     commandPlaceholder: "Type 'reset', 'next', 'toggle', or '--help'",
   },
   fr: {
@@ -122,6 +141,30 @@ const translations = {
     rallySeries: 'Série',
     rallyHighlight: 'Point fort',
     rallyWindow: 'Période',
+    vercelTitle: 'Templates voiture prêts pour Vercel',
+    vercelIntro:
+      'Ces templates voiture en vanilla JS se déploient sur Vercel en site statique : HTML, CSS et JS sans build.',
+    templateCanvasTitle: 'Canvas Car Racer',
+    templateCanvasBody:
+      'Simulation Canvas avec sprites personnalisables pour un décor ville ou campagne.',
+    templateThreeTitle: 'Three.js Car Viewer',
+    templateThreeBody:
+      'Chargeur GLTF léger avec orbit controls pour des présentations 3D interactives.',
+    templateSvgTitle: 'SVG Car Animator',
+    templateSvgBody: 'Animation SVG minimale pour itinéraires 2D et suivi de flotte.',
+    vercelStepsTitle: 'Déployer sur Vercel en quelques minutes',
+    vercelStepOne:
+      'Créez un index.html avec scripts, ajoutez style.css, et gardez les assets à la racine.',
+    vercelStepTwo:
+      'Optionnel : ajoutez vercel.json pour réécrire toutes les routes vers index.html.',
+    vercelStepThree:
+      'Poussez sur GitHub et importez le repo dans Vercel pour un déploiement instantané.',
+    vercelTipsTitle: 'Astuces de personnalisation rapide',
+    vercelTipOne:
+      'Remplacez par des voitures GLTF gratuites (Sketchfab) et ajustez les matériaux pour la ville.',
+    vercelTipTwo:
+      'Ajoutez des stats de campagne et des jalons de livraison directement sur le HUD.',
+    vercelTipThree: 'Testez avec npx serve, puis poussez pour redéployer.',
     commandPlaceholder: "Tapez 'reset', 'next', 'toggle' ou '--help'",
   },
 };
