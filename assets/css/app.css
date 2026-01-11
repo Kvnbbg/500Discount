@@ -27,6 +27,17 @@ body {
   font-family: 'Roboto', sans-serif;
 }
 
+body.js-enabled .reveal-card {
+  opacity: 0;
+  filter: blur(6px);
+  transition: opacity 0.6s ease, filter 0.6s ease;
+}
+
+body.js-enabled .reveal-card.is-visible {
+  opacity: 1;
+  filter: blur(0);
+}
+
 #ai-loop {
   margin: 10px auto;
   padding: 10px 20px;
@@ -165,7 +176,8 @@ a:hover {
   box-shadow: var(--shadow);
   padding: 20px;
   margin-bottom: 20px;
-  transition: background-color var(--transition-speed);
+  transition: background-color var(--transition-speed), box-shadow 0.3s ease;
+  transform: translateY(var(--float-offset, 0px));
 }
 
 .auth-card {
@@ -242,6 +254,7 @@ a:hover {
   padding: 14px;
   display: grid;
   gap: 8px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .template-card {
@@ -251,6 +264,7 @@ a:hover {
   padding: 14px;
   display: grid;
   gap: 8px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .data-card h3,
@@ -262,6 +276,13 @@ a:hover {
 .template-card h3 {
   font-size: 1rem;
   color: var(--highlight-color);
+}
+
+.data-card:hover,
+.rally-card:hover,
+.template-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 14px rgba(0, 0, 0, 0.5);
 }
 
 .data-meta {
@@ -393,7 +414,7 @@ input[type='checkbox'] {
   border: none;
   border-radius: var(--border-radius);
   cursor: pointer;
-  transition: background var(--transition-speed);
+  transition: background var(--transition-speed), transform 0.2s ease;
 }
 
 .file-btn.ghost {
@@ -404,6 +425,7 @@ input[type='checkbox'] {
 
 .file-btn:hover {
   background: var(--highlight-color);
+  transform: translateY(-2px);
 }
 
 .file-btn.block {
@@ -648,6 +670,134 @@ input[type='checkbox'] {
   border-radius: var(--border-radius);
   background: var(--background-color);
   margin-bottom: 10px;
+}
+
+.brake-grid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  align-items: center;
+}
+
+.brake-controls {
+  display: grid;
+  gap: 12px;
+}
+
+.brake-pressure-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.brake-pressure-value {
+  min-width: 52px;
+  font-weight: bold;
+  color: var(--highlight-color);
+}
+
+.brake-toggle {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.brake-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.brake-display {
+  display: grid;
+  gap: 16px;
+  align-items: center;
+  justify-items: center;
+}
+
+.brake-gauge {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: conic-gradient(
+    var(--highlight-color) var(--brake-level, 45%),
+    rgba(255, 255, 255, 0.08) 0
+  );
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.6);
+  position: relative;
+}
+
+.brake-gauge::after {
+  content: '';
+  position: absolute;
+  inset: 12px;
+  background: var(--card-bg);
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.brake-gauge-value,
+.brake-gauge-label {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+}
+
+.brake-gauge-value {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: var(--highlight-color);
+}
+
+.brake-gauge-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: rgba(224, 224, 224, 0.7);
+}
+
+.brake-metrics {
+  display: grid;
+  gap: 6px;
+  font-size: 0.9rem;
+}
+
+.brake-signal {
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+  font-size: 0.85rem;
+  text-align: center;
+  min-width: 200px;
+}
+
+.whiteout-overlay {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.2));
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1200;
+}
+
+.whiteout-overlay.active {
+  animation: whiteoutFlash 0.7s ease-out;
+}
+
+@keyframes whiteoutFlash {
+  0% {
+    opacity: 0;
+  }
+  30% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+  }
 }
 
 footer {

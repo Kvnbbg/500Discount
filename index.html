@@ -252,6 +252,53 @@
       <div id="rallyList" class="rally-grid" aria-live="polite"></div>
     </div>
 
+    <div class="card" id="brakeLabCard">
+      <h2 data-i18n="brakeLabTitle">Whiteout Braking Display</h2>
+      <p data-i18n="brakeLabSubtitle">
+        Simulate EV braking pressure, ABS assist, and watch the whiteout flash when braking hits peak load.
+      </p>
+      <div class="brake-grid">
+        <div class="brake-controls">
+          <label for="brakePressure" data-i18n="brakePressureLabel">
+            Brake pressure
+          </label>
+          <div class="brake-pressure-row">
+            <input type="range" id="brakePressure" min="0" max="100" value="45">
+            <span id="brakePressureValue" class="brake-pressure-value">45%</span>
+          </div>
+          <label class="brake-toggle">
+            <input type="checkbox" id="absToggle" checked>
+            <span data-i18n="brakeAbsToggle">ABS assist engaged</span>
+          </label>
+          <div class="brake-actions">
+            <button class="file-btn" id="simulateBrake" data-i18n="brakeSimulateBtn">Simulate Brake</button>
+            <button class="file-btn ghost" id="releaseBrake" data-i18n="brakeReleaseBtn">Release</button>
+          </div>
+        </div>
+        <div class="brake-display">
+          <div class="brake-gauge" id="brakeGauge">
+            <span class="brake-gauge-value" id="brakeGaugeValue">45%</span>
+            <span class="brake-gauge-label" data-i18n="brakeGaugeLabel">Brake Pressure</span>
+          </div>
+          <div class="brake-metrics">
+            <div>
+              <span data-i18n="brakeAbsLabel">ABS</span>:
+              <strong id="absStatus">ON</strong>
+            </div>
+            <div>
+              <span data-i18n="brakeTempLabel">Rotor temp</span>:
+              <strong id="brakeTemp">320°C</strong>
+            </div>
+            <div>
+              <span data-i18n="brakeFeedbackLabel">Feedback</span>:
+              <strong id="brakeFeedback">Stable</strong>
+            </div>
+          </div>
+          <div id="brakeSignal" class="brake-signal" role="status" aria-live="polite"></div>
+        </div>
+      </div>
+    </div>
+
     <div class="card" id="vercelCard">
       <h2 data-i18n="vercelTitle">Vercel-ready Car Templates</h2>
       <p data-i18n="vercelIntro">
@@ -420,6 +467,8 @@
       </div>
     </div>
   </div>
+
+  <div id="brakeWhiteout" class="whiteout-overlay" aria-hidden="true"></div>
 
   <footer>
     <div class="social-links">
