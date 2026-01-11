@@ -88,6 +88,25 @@ const translations = {
     vercelTipTwo: 'Overlay campaign stats and delivery milestones directly on the HUD.',
     vercelTipThree: 'Test locally with npx serve, then push to redeploy.',
     commandPlaceholder: "Type 'reset', 'next', 'toggle', or '--help'",
+    brakeLabTitle: 'Whiteout Braking Display',
+    brakeLabSubtitle:
+      'Simulate EV braking pressure, ABS assist, and watch the whiteout flash when braking hits peak load.',
+    brakePressureLabel: 'Brake pressure',
+    brakeAbsToggle: 'ABS assist engaged',
+    brakeSimulateBtn: 'Simulate Brake',
+    brakeReleaseBtn: 'Release',
+    brakeGaugeLabel: 'Brake Pressure',
+    brakeAbsLabel: 'ABS',
+    brakeTempLabel: 'Rotor temp',
+    brakeFeedbackLabel: 'Feedback',
+    brakeSignalIdle: 'Coasting · Brake system idle',
+    brakeSignalActive: 'Braking engaged · Grip steady',
+    brakeSignalWhiteout: 'Whiteout braking · Maximum deceleration',
+    brakeFeedbackStable: 'Stable',
+    brakeFeedbackAggressive: 'Aggressive',
+    brakeFeedbackWhiteout: 'Whiteout',
+    brakeAbsOn: 'ON',
+    brakeAbsOff: 'OFF',
   },
   fr: {
     headerTitle: 'Tokyo TCG Hub & Star Bazaar',
@@ -166,6 +185,25 @@ const translations = {
       'Ajoutez des stats de campagne et des jalons de livraison directement sur le HUD.',
     vercelTipThree: 'Testez avec npx serve, puis poussez pour redéployer.',
     commandPlaceholder: "Tapez 'reset', 'next', 'toggle' ou '--help'",
+    brakeLabTitle: 'Affichage de freinage Whiteout',
+    brakeLabSubtitle:
+      "Simule la pression de freinage, l'assistance ABS, et observe le flash whiteout quand le freinage atteint le pic.",
+    brakePressureLabel: 'Pression de freinage',
+    brakeAbsToggle: 'Assistance ABS engagée',
+    brakeSimulateBtn: 'Simuler le freinage',
+    brakeReleaseBtn: 'Relâcher',
+    brakeGaugeLabel: 'Pression de freinage',
+    brakeAbsLabel: 'ABS',
+    brakeTempLabel: 'Température disque',
+    brakeFeedbackLabel: 'Retour',
+    brakeSignalIdle: 'Roulage · Freinage au repos',
+    brakeSignalActive: 'Freinage engagé · Adhérence stable',
+    brakeSignalWhiteout: 'Freinage whiteout · Décélération max',
+    brakeFeedbackStable: 'Stable',
+    brakeFeedbackAggressive: 'Agressif',
+    brakeFeedbackWhiteout: 'Whiteout',
+    brakeAbsOn: 'ACTIF',
+    brakeAbsOff: 'INACTIF',
   },
 };
 
@@ -800,6 +838,126 @@ const initCoinGame = ({
   });
 };
 
+const initBrakeLab = ({
+  pressureInput,
+  pressureValue,
+  absToggle,
+  simulateBtn,
+  releaseBtn,
+  gauge,
+  gaugeValue,
+  absStatus,
+  brakeTemp,
+  brakeFeedback,
+  brakeSignal,
+  whiteoutOverlay,
+}) => {
+  if (
+    !pressureInput ||
+    !pressureValue ||
+    !absToggle ||
+    !simulateBtn ||
+    !releaseBtn ||
+    !gauge ||
+    !gaugeValue ||
+    !absStatus ||
+    !brakeTemp ||
+    !brakeFeedback ||
+    !brakeSignal
+  ) {
+    return { applyLanguage: () => {} };
+  }
+
+  const state = {
+    pressure: Number(pressureInput.value) || 0,
+    absEnabled: absToggle.checked,
+    isBraking: false,
+  };
+
+  const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+
+  const triggerWhiteout = () => {
+    if (!whiteoutOverlay) {
+      return;
+    }
+    whiteoutOverlay.classList.add('active');
+    setTimeout(() => {
+      whiteoutOverlay.classList.remove('active');
+    }, 700);
+  };
+
+  const getFeedbackKey = () => {
+    if (state.pressure >= 80) {
+      return 'brakeFeedbackWhiteout';
+    }
+    if (state.pressure >= 50) {
+      return 'brakeFeedbackAggressive';
+    }
+    return 'brakeFeedbackStable';
+  };
+
+  const updateSignal = () => {
+    let signalKey = 'brakeSignalIdle';
+    if (state.isBraking) {
+      signalKey = state.pressure >= 80 ? 'brakeSignalWhiteout' : 'brakeSignalActive';
+    }
+    brakeSignal.textContent = getTranslation(currentLanguage, signalKey);
+  };
+
+  const updateMetrics = () => {
+    const temp = Math.round(260 + state.pressure * 2.1);
+    brakeTemp.textContent = `${temp}°C`;
+    brakeFeedback.textContent = getTranslation(currentLanguage, getFeedbackKey());
+    absStatus.textContent = getTranslation(
+      currentLanguage,
+      state.absEnabled ? 'brakeAbsOn' : 'brakeAbsOff'
+    );
+  };
+
+  const updateGauge = () => {
+    const pressure = clamp(state.pressure, 0, 100);
+    pressureValue.textContent = `${pressure}%`;
+    gaugeValue.textContent = `${pressure}%`;
+    gauge.style.setProperty('--brake-level', `${pressure}%`);
+  };
+
+  const applyLanguage = () => {
+    updateMetrics();
+    updateSignal();
+  };
+
+  pressureInput.addEventListener('input', (event) => {
+    state.pressure = Number(event.target.value);
+    updateGauge();
+    updateMetrics();
+    updateSignal();
+  });
+
+  absToggle.addEventListener('change', (event) => {
+    state.absEnabled = event.target.checked;
+    updateMetrics();
+  });
+
+  simulateBtn.addEventListener('click', () => {
+    state.isBraking = true;
+    updateMetrics();
+    updateSignal();
+    if (state.pressure >= 80) {
+      triggerWhiteout();
+    }
+  });
+
+  releaseBtn.addEventListener('click', () => {
+    state.isBraking = false;
+    updateSignal();
+  });
+
+  updateGauge();
+  applyLanguage();
+
+  return { applyLanguage };
+};
+
 const initCommandPalette = ({
   commandInput,
   commandOutput,
@@ -1073,6 +1231,29 @@ const initFirstRun = () => {
   }
 };
 
+const initCardReveal = () => {
+  const cards = document.querySelectorAll('.card, .command-card, .score-card');
+  if (!cards.length || !('IntersectionObserver' in window)) {
+    return;
+  }
+
+  cards.forEach((card) => card.classList.add('reveal-card'));
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.2 }
+  );
+
+  cards.forEach((card) => observer.observe(card));
+};
+
 const initCardAnimation = () => {
   const cards = document.querySelectorAll('.card, .command-card, .score-card');
 
@@ -1087,7 +1268,7 @@ const initCardAnimation = () => {
       const frequency = 0.5;
       const phaseOffset = (index * Math.PI) / 6;
       const deltaY = amplitude * Math.sin(2 * Math.PI * frequency * time + phaseOffset);
-      card.style.transform = `translateY(${deltaY}px)`;
+      card.style.setProperty('--float-offset', `${deltaY}px`);
     });
     requestAnimationFrame(animateCards);
   };
@@ -1096,6 +1277,7 @@ const initCardAnimation = () => {
 };
 
 const initApp = async () => {
+  document.body.classList.add('js-enabled');
   const aiLoopElement = document.getElementById('ai-loop');
   const progressBar = document.getElementById('progressBar');
   const resetBtn = document.getElementById('resetBtn');
@@ -1119,6 +1301,18 @@ const initApp = async () => {
   const languageLabel = document.getElementById('languageLabel');
   const evDataGrid = document.getElementById('evDataGrid');
   const rallyList = document.getElementById('rallyList');
+  const brakePressure = document.getElementById('brakePressure');
+  const brakePressureValue = document.getElementById('brakePressureValue');
+  const absToggle = document.getElementById('absToggle');
+  const simulateBrake = document.getElementById('simulateBrake');
+  const releaseBrake = document.getElementById('releaseBrake');
+  const brakeGauge = document.getElementById('brakeGauge');
+  const brakeGaugeValue = document.getElementById('brakeGaugeValue');
+  const absStatus = document.getElementById('absStatus');
+  const brakeTemp = document.getElementById('brakeTemp');
+  const brakeFeedback = document.getElementById('brakeFeedback');
+  const brakeSignal = document.getElementById('brakeSignal');
+  const brakeWhiteout = document.getElementById('brakeWhiteout');
   const authStatus = document.getElementById('authStatus');
   const authBadge = document.getElementById('authBadge');
   const logoutBtn = document.getElementById('logoutBtn');
@@ -1147,12 +1341,31 @@ const initApp = async () => {
     loginForm,
     gatedButtons,
   });
+
+  const brakeLab = initBrakeLab({
+    pressureInput: brakePressure,
+    pressureValue: brakePressureValue,
+    absToggle,
+    simulateBtn: simulateBrake,
+    releaseBtn: releaseBrake,
+    gauge: brakeGauge,
+    gaugeValue: brakeGaugeValue,
+    absStatus,
+    brakeTemp,
+    brakeFeedback,
+    brakeSignal,
+    whiteoutOverlay: brakeWhiteout,
+  });
+
   initLanguageToggle({
     languageToggle,
     languageLabel,
     evDataGrid,
     rallyList,
-    onLanguageChange: refreshAuthState,
+    onLanguageChange: () => {
+      refreshAuthState();
+      brakeLab.applyLanguage();
+    },
   });
   initAiLoop(aiLoopElement, () => getAiMessages(currentLanguage));
   initMathCalculator({ mathInput, calcBtn, mathResult });
@@ -1181,6 +1394,7 @@ const initApp = async () => {
   initExternalLinks();
   initKeyboardShortcuts({ resetTasks, validateNextTask, toggleTheme });
   initFirstRun();
+  initCardReveal();
   initCardAnimation();
 
   if (resetBtn) {
