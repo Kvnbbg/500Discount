@@ -54,9 +54,9 @@
 </head>
 <body>
   <section id="controls" aria-label="Vehicle controls">
-    <h2>🕹️ Controls</h2>
-    <p class="pill">Grab + drag to rotate. Toggle auto-loop for showcase.</p>
-    <h4>🛻 Control Your Vehicle</h4>
+    <h2>🕹️ Garage Controls</h2>
+    <p class="pill">Drive inside the garage, grab + drag to rotate, or toggle auto-loop.</p>
+    <h4>🛻 Maneuver Your Vehicle</h4>
     <div class="controls">
       <div class="control-row">
         <button id="left-btn">⬅️ Left</button>
@@ -82,6 +82,7 @@
   <script>
     // Setup scene, camera, and renderer
     const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x2f3438);
     const camera = new THREE.PerspectiveCamera(
       75,
       window.innerWidth / window.innerHeight,
@@ -174,18 +175,103 @@
 
     carGroup.add(wheel1, wheel2, wheel3, wheel4);
 
-    // Ground plane for the car to cast shadows on
-    const groundGeometry = new THREE.PlaneGeometry(50, 50);
-    const groundMaterial = new THREE.MeshPhongMaterial({ color: 0x999999 });
+    const garage = new THREE.Group();
+    scene.add(garage);
+
+    const garageWidth = 18;
+    const garageDepth = 24;
+    const garageHeight = 6;
+
+    // Garage floor
+    const groundGeometry = new THREE.PlaneGeometry(garageWidth, garageDepth);
+    const groundMaterial = new THREE.MeshStandardMaterial({
+      color: 0x9ea4aa,
+      roughness: 0.85,
+      metalness: 0.05,
+    });
     const ground = new THREE.Mesh(groundGeometry, groundMaterial);
     ground.rotation.x = -Math.PI / 2;
     ground.position.y = -0.4;
     ground.receiveShadow = true;
-    scene.add(ground);
+    garage.add(ground);
+
+    // Garage walls
+    const wallMaterial = new THREE.MeshStandardMaterial({
+      color: 0xd8dde1,
+      roughness: 0.7,
+      metalness: 0.05,
+    });
+    const backWall = new THREE.Mesh(
+      new THREE.PlaneGeometry(garageWidth, garageHeight),
+      wallMaterial
+    );
+    backWall.position.set(0, garageHeight / 2 - 0.4, -garageDepth / 2);
+    backWall.receiveShadow = true;
+    garage.add(backWall);
+
+    const leftWall = new THREE.Mesh(
+      new THREE.PlaneGeometry(garageDepth, garageHeight),
+      wallMaterial
+    );
+    leftWall.rotation.y = Math.PI / 2;
+    leftWall.position.set(-garageWidth / 2, garageHeight / 2 - 0.4, 0);
+    leftWall.receiveShadow = true;
+    garage.add(leftWall);
+
+    const rightWall = leftWall.clone();
+    rightWall.rotation.y = -Math.PI / 2;
+    rightWall.position.set(garageWidth / 2, garageHeight / 2 - 0.4, 0);
+    garage.add(rightWall);
+
+    // Garage ceiling
+    const ceiling = new THREE.Mesh(
+      new THREE.PlaneGeometry(garageWidth, garageDepth),
+      new THREE.MeshStandardMaterial({
+        color: 0xcfd6dc,
+        roughness: 0.5,
+        metalness: 0.1,
+      })
+    );
+    ceiling.rotation.x = Math.PI / 2;
+    ceiling.position.set(0, garageHeight - 0.4, 0);
+    garage.add(ceiling);
+
+    // Garage door panel
+    const doorMaterial = new THREE.MeshStandardMaterial({
+      color: 0xbfc6cd,
+      roughness: 0.6,
+      metalness: 0.2,
+    });
+    const door = new THREE.Mesh(
+      new THREE.PlaneGeometry(garageWidth * 0.8, garageHeight * 0.7),
+      doorMaterial
+    );
+    door.position.set(0, garageHeight * 0.35 - 0.4, garageDepth / 2 - 0.01);
+    door.rotation.y = Math.PI;
+    garage.add(door);
+
+    // Floor markings
+    const stripeMaterial = new THREE.MeshStandardMaterial({
+      color: 0xf2f2f2,
+      roughness: 0.6,
+      metalness: 0.1,
+    });
+    const stripeGeometry = new THREE.PlaneGeometry(garageWidth * 0.6, 0.25);
+    for (let i = -1; i <= 1; i += 1) {
+      const stripe = new THREE.Mesh(stripeGeometry, stripeMaterial);
+      stripe.rotation.x = -Math.PI / 2;
+      stripe.position.set(0, -0.39, i * 4);
+      garage.add(stripe);
+    }
+
+    const overheadLight = new THREE.PointLight(0xffffff, 0.9, 30);
+    overheadLight.position.set(0, garageHeight - 0.8, 2);
+    overheadLight.castShadow = true;
+    scene.add(overheadLight);
 
     // Camera position and settings
-    camera.position.set(0, 2, 6);
-    camera.lookAt(0, 0, 0);
+    camera.position.set(0, 2.2, 7);
+    camera.lookAt(0, 0.2, 0);
 
     let carSpeed = 0;
     let carRotation = 0;
@@ -261,6 +347,13 @@
       carRotation += deltaX * 0.005;
     });
 
+    const garageBounds = {
+      minX: -garageWidth / 2 + 1.5,
+      maxX: garageWidth / 2 - 1.5,
+      minZ: -garageDepth / 2 + 2,
+      maxZ: garageDepth / 2 - 2,
+    };
+
     // Update loop with smooth movement and realistic car behavior
     function animate() {
       requestAnimationFrame(animate);
@@ -274,19 +367,34 @@
       if (autoLoop) {
         const time = performance.now() * 0.0005;
         carGroup.position.x = Math.cos(time) * 3;
-        carGroup.position.z = Math.sin(time) * 3;
-        carGroup.rotation.y = -time;
+        carGroup.position.z = Math.sin(time) * 5;
+        carGroup.rotation.y = -time + Math.PI / 2;
       } else {
         // Smooth car rotation
-        carGroup.rotation.y = THREE.MathUtils.lerp(carGroup.rotation.y, carRotation, 0.1);
+        carGroup.rotation.y = THREE.MathUtils.lerp(carGroup.rotation.y, carRotation, 0.12);
 
-        // Smooth acceleration and deceleration
-        carGroup.position.z -= carSpeed;
+        const forward = new THREE.Vector3(0, 0, -1).applyAxisAngle(
+          new THREE.Vector3(0, 1, 0),
+          carGroup.rotation.y
+        );
+        carGroup.position.addScaledVector(forward, carSpeed);
 
         if (carSpeed > 0) {
-          carSpeed -= deceleration; // Gradual deceleration
+          carSpeed = Math.max(0, carSpeed - deceleration);
         }
       }
+
+      // Clamp the car to the garage bounds
+      carGroup.position.x = THREE.MathUtils.clamp(
+        carGroup.position.x,
+        garageBounds.minX,
+        garageBounds.maxX
+      );
+      carGroup.position.z = THREE.MathUtils.clamp(
+        carGroup.position.z,
+        garageBounds.minZ,
+        garageBounds.maxZ
+      );
 
       // Render the scene
       renderer.render(scene, camera);
