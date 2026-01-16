@@ -49,6 +49,17 @@ Then open:
 http://localhost:5173/index.html
 ```
 
+## Agentic Workflow Context
+
+Project context and agentic workflow notes live in `CLAUDE.md` to keep architecture, commands, and guardrails in one place.
+
+## Deploy on Vercel
+
+1. Import the repository in Vercel.
+2. Set **Framework Preset** to **Other**.
+3. Keep **Root Directory** as the repo root.
+4. Deploy. The included `vercel.json` rewrites `/` to `index.html` for a smooth SPA experience.
+
 ## Configuration
 
 Runtime configuration is stored in `config/app-config.json` and compiled into `assets/js/runtime-config.js` during `npm run build`.
