@@ -1,3 +1,5 @@
+import { readStorageValue, writeStorageValue } from './utils/storage.js';
+
 const translations = {
   en: {
     landingTitle: 'Tokyo TCG Hub & Star Bazaar',
@@ -56,12 +58,12 @@ const initLanding = () => {
     return;
   }
 
-  const storedLanguage = window.localStorage.getItem('language') || 'en';
+  const storedLanguage = readStorageValue('language', 'en');
   let currentLanguage = storedLanguage === 'fr' ? 'fr' : 'en';
 
   const setLanguage = (lang) => {
     currentLanguage = lang;
-    window.localStorage.setItem('language', currentLanguage);
+    writeStorageValue('language', currentLanguage);
     languageLabel.textContent = currentLanguage.toUpperCase();
     applyTranslations(currentLanguage);
   };
