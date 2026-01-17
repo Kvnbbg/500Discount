@@ -9,7 +9,15 @@
   --border-color: #555;
   --transition-speed: 0.3s;
   --border-radius: 8px;
+  --border-radius-lg: 14px;
   --shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 16px 30px rgba(0, 0, 0, 0.45);
+  --surface: rgba(30, 30, 30, 0.92);
+  --surface-glass: rgba(26, 26, 26, 0.75);
+  --surface-highlight: rgba(255, 204, 0, 0.08);
+  --text-muted: rgba(224, 224, 224, 0.7);
+  --ring: 0 0 0 3px rgba(255, 204, 0, 0.3);
+  --max-width: 1120px;
 }
 
 * {
@@ -19,12 +27,15 @@
 }
 
 body {
-  height: 100vh;
+  min-height: 100vh;
   overflow-y: auto;
-  background: linear-gradient(45deg, #1a1a1a, #333);
-  animation: bgGradient 10s ease infinite;
+  background: radial-gradient(circle at top, rgba(255, 204, 0, 0.08), transparent 45%),
+    radial-gradient(circle at 20% 20%, rgba(0, 255, 255, 0.07), transparent 40%),
+    linear-gradient(135deg, #121212, #242424 50%, #161616);
+  animation: bgGradient 16s ease infinite;
   color: var(--text-color);
   font-family: 'Roboto', sans-serif;
+  line-height: 1.6;
 }
 
 body.js-enabled .reveal-card {
@@ -39,10 +50,12 @@ body.js-enabled .reveal-card.is-visible {
 }
 
 #ai-loop {
-  margin: 10px auto;
-  padding: 10px 20px;
-  border: 2px solid var(--primary-color);
-  border-radius: 5px;
+  margin: 16px auto;
+  padding: 10px 24px;
+  border: 1px solid rgba(255, 204, 0, 0.5);
+  border-radius: 999px;
+  background: var(--surface-highlight);
+  backdrop-filter: blur(6px);
   width: fit-content;
   font-size: 0.8em;
   text-align: center;
@@ -75,6 +88,11 @@ body.valentine-theme {
   --background-color: #2a0d1f;
   --card-bg: #3a1f2e;
   --border-color: #ff8fd1;
+  --surface: rgba(58, 31, 46, 0.9);
+  --surface-glass: rgba(68, 34, 52, 0.7);
+  --surface-highlight: rgba(255, 143, 209, 0.15);
+  --text-muted: rgba(255, 209, 232, 0.7);
+  --ring: 0 0 0 3px rgba(255, 143, 209, 0.35);
 }
 
 @keyframes bgGradient {
@@ -90,10 +108,12 @@ body.valentine-theme {
 }
 
 header {
-  background-color: rgba(0, 0, 0, 0.85);
-  padding: 20px;
+  background: rgba(8, 8, 8, 0.9);
+  padding: 24px;
   text-align: center;
-  border-bottom: 2px solid var(--border-color);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(10px);
 }
 
 header h1 {
@@ -115,7 +135,7 @@ header h1 {
 .header-subtitle {
   margin-top: 10px;
   font-size: 0.9rem;
-  color: rgba(224, 224, 224, 0.75);
+  color: var(--text-muted);
 }
 
 .header-actions {
@@ -144,7 +164,6 @@ h2 {
 
 p {
   margin-bottom: 10px;
-  line-height: 1.4;
 }
 
 a {
@@ -158,9 +177,9 @@ a:hover {
 }
 
 .container {
-  max-width: 900px;
-  margin: 20px auto;
-  padding: 15px;
+  max-width: var(--max-width);
+  margin: 24px auto;
+  padding: 16px;
 }
 
 .center {
@@ -170,18 +189,43 @@ a:hover {
 .card,
 .command-card,
 .score-card {
-  background-color: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius);
-  box-shadow: var(--shadow);
-  padding: 20px;
+  background: linear-gradient(140deg, var(--surface), rgba(20, 20, 20, 0.98));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: 22px;
   margin-bottom: 20px;
-  transition: background-color var(--transition-speed), box-shadow 0.3s ease;
+  transition: background-color var(--transition-speed), box-shadow 0.3s ease, transform 0.3s ease;
   transform: translateY(var(--float-offset, 0px));
 }
 
+.content-grid {
+  display: grid;
+  gap: 22px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+.content-grid > .card,
+.content-grid > .command-card,
+.content-grid > .score-card {
+  margin-bottom: 0;
+}
+
+.content-grid .score-card,
+.content-grid .progress-container {
+  grid-column: 1 / -1;
+}
+
+.card:hover,
+.command-card:hover,
+.score-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 35px rgba(0, 0, 0, 0.55);
+}
+
 .auth-card {
-  border: 1px solid rgba(255, 204, 0, 0.4);
+  border: 1px solid rgba(255, 204, 0, 0.35);
+  background: linear-gradient(140deg, rgba(35, 35, 35, 0.95), rgba(18, 18, 18, 0.98));
 }
 
 .auth-header {
@@ -205,16 +249,26 @@ a:hover {
 
 .auth-grid input {
   padding: 8px 10px;
-  border-radius: 6px;
-  border: 1px solid var(--border-color);
-  background-color: rgba(0, 0, 0, 0.4);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background-color: rgba(12, 12, 12, 0.8);
   color: var(--text-color);
+}
+
+.auth-grid input:focus,
+.command-card input:focus,
+.coin-game-input:focus,
+.math-input:focus,
+.window-content textarea:focus {
+  outline: none;
+  border-color: var(--highlight-color);
+  box-shadow: var(--ring);
 }
 
 .auth-footnote {
   margin-top: 12px;
   font-size: 0.8rem;
-  color: rgba(224, 224, 224, 0.7);
+  color: var(--text-muted);
 }
 
 .status-pill {
@@ -281,13 +335,13 @@ a:hover {
 .data-card:hover,
 .rally-card:hover,
 .template-card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-4px) scale(1.01);
   box-shadow: 0 8px 14px rgba(0, 0, 0, 0.5);
 }
 
 .data-meta {
   font-size: 0.85rem;
-  color: rgba(224, 224, 224, 0.75);
+  color: var(--text-muted);
 }
 
 .steps-list,
@@ -407,25 +461,31 @@ input[type='checkbox'] {
 }
 
 .file-btn {
-  padding: 8px 16px;
+  padding: 10px 18px;
   margin: 5px;
-  background: var(--primary-color);
-  color: var(--background-color);
-  border: none;
-  border-radius: var(--border-radius);
+  background: linear-gradient(135deg, rgba(255, 204, 0, 0.95), rgba(255, 176, 77, 0.95));
+  color: #111;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
   cursor: pointer;
-  transition: background var(--transition-speed), transform 0.2s ease;
+  transition: background var(--transition-speed), transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .file-btn.ghost {
-  background: transparent;
+  background: rgba(255, 255, 255, 0.05);
   color: var(--highlight-color);
-  border: 1px solid var(--highlight-color);
+  border: 1px solid rgba(255, 204, 0, 0.6);
 }
 
 .file-btn:hover {
   background: var(--highlight-color);
   transform: translateY(-2px);
+  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.35);
+}
+
+.file-btn:focus-visible {
+  outline: none;
+  box-shadow: var(--ring);
 }
 
 .file-btn.block {
@@ -436,12 +496,12 @@ input[type='checkbox'] {
 .command-card input,
 .coin-game-input,
 .math-input {
-  width: 80%;
+  width: min(520px, 100%);
   padding: 10px;
   margin-bottom: 10px;
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius);
-  background: #111;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  background: rgba(12, 12, 12, 0.9);
   color: var(--text-color);
 }
 
@@ -462,8 +522,8 @@ input[type='checkbox'] {
 }
 
 .status-banner {
-  background: rgba(255, 204, 0, 0.15);
-  border: 1px solid var(--highlight-color);
+  background: var(--surface-highlight);
+  border: 1px solid rgba(255, 204, 0, 0.4);
   text-align: center;
 }
 
@@ -491,13 +551,13 @@ input[type='checkbox'] {
 }
 
 .modal-content {
-  background-color: var(--card-bg);
+  background-color: var(--surface);
   margin: 10% auto;
   padding: 20px;
-  border: 1px solid var(--border-color);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   width: 90%;
   max-width: 600px;
-  border-radius: var(--border-radius);
+  border-radius: var(--border-radius-lg);
   text-align: center;
 }
 
@@ -520,27 +580,27 @@ input[type='checkbox'] {
   position: relative;
   width: 100%;
   min-height: 300px;
-  border: 2px dashed var(--border-color);
-  border-radius: var(--border-radius);
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  border-radius: var(--border-radius-lg);
   margin: 20px 0;
   overflow: hidden;
   padding: 10px;
-  background: var(--background-color);
+  background: rgba(10, 10, 10, 0.6);
 }
 
 .window {
   position: absolute;
   width: 280px;
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius);
-  box-shadow: var(--shadow);
+  background: var(--surface-glass);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-lg);
   transition: transform var(--transition-speed);
 }
 
 .window-header {
-  background: var(--primary-color);
-  color: var(--background-color);
+  background: linear-gradient(135deg, rgba(255, 204, 0, 0.9), rgba(255, 160, 70, 0.9));
+  color: #111;
   padding: 8px;
   cursor: move;
   border-top-left-radius: var(--border-radius);
@@ -556,9 +616,9 @@ input[type='checkbox'] {
 .window-content textarea {
   width: 100%;
   height: 100px;
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius);
-  background: #111;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  background: rgba(12, 12, 12, 0.9);
   color: var(--text-color);
 }
 
@@ -801,11 +861,11 @@ input[type='checkbox'] {
 }
 
 footer {
-  background: linear-gradient(135deg, var(--accent-color), var(--highlight-color));
+  background: linear-gradient(135deg, rgba(255, 204, 0, 0.95), rgba(255, 148, 77, 0.95));
   padding: 20px 10px;
   text-align: center;
-  color: var(--background-color);
-  border-radius: var(--border-radius);
+  color: #111;
+  border-radius: var(--border-radius-lg);
   margin-top: 20px;
 }
 
