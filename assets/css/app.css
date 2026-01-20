@@ -18,6 +18,14 @@
   --text-muted: rgba(224, 224, 224, 0.7);
   --ring: 0 0 0 3px rgba(255, 204, 0, 0.3);
   --max-width: 1120px;
+  --glow: 0 0 30px rgba(255, 204, 0, 0.25);
+  --card-border: rgba(255, 255, 255, 0.12);
+  --elevation: 0 20px 40px rgba(0, 0, 0, 0.55);
+  --space-lg: clamp(18px, 3vw, 28px);
+  --space-md: clamp(12px, 2vw, 20px);
+  --space-sm: clamp(8px, 1.5vw, 14px);
+  --font-title: clamp(1.3rem, 2vw + 0.9rem, 2rem);
+  --font-body: clamp(0.95rem, 0.6vw + 0.8rem, 1.05rem);
 }
 
 * {
@@ -29,13 +37,27 @@
 body {
   min-height: 100vh;
   overflow-y: auto;
-  background: radial-gradient(circle at top, rgba(255, 204, 0, 0.08), transparent 45%),
-    radial-gradient(circle at 20% 20%, rgba(0, 255, 255, 0.07), transparent 40%),
-    linear-gradient(135deg, #121212, #242424 50%, #161616);
+  background: radial-gradient(circle at top, rgba(255, 204, 0, 0.12), transparent 45%),
+    radial-gradient(circle at 20% 15%, rgba(0, 255, 255, 0.1), transparent 45%),
+    radial-gradient(circle at 80% 30%, rgba(255, 120, 120, 0.12), transparent 40%),
+    linear-gradient(135deg, #101010, #232323 50%, #141414);
   animation: bgGradient 16s ease infinite;
   color: var(--text-color);
   font-family: 'Roboto', sans-serif;
   line-height: 1.6;
+  font-size: var(--font-body);
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at 10% 20%, rgba(255, 204, 0, 0.08), transparent 35%),
+    radial-gradient(circle at 90% 15%, rgba(70, 190, 255, 0.1), transparent 40%),
+    radial-gradient(circle at 50% 100%, rgba(255, 150, 70, 0.08), transparent 45%);
+  pointer-events: none;
+  opacity: 0.8;
+  z-index: -1;
 }
 
 body.js-enabled .reveal-card {
@@ -52,9 +74,9 @@ body.js-enabled .reveal-card.is-visible {
 #ai-loop {
   margin: 16px auto;
   padding: 10px 24px;
-  border: 1px solid rgba(255, 204, 0, 0.5);
+  border: 1px solid rgba(255, 204, 0, 0.6);
   border-radius: 999px;
-  background: var(--surface-highlight);
+  background: linear-gradient(120deg, rgba(255, 204, 0, 0.15), rgba(20, 20, 20, 0.6));
   backdrop-filter: blur(6px);
   width: fit-content;
   font-size: 0.8em;
@@ -109,7 +131,7 @@ body.valentine-theme {
 
 header {
   background: rgba(8, 8, 8, 0.9);
-  padding: 24px;
+  padding: var(--space-lg);
   text-align: center;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.35);
@@ -118,7 +140,7 @@ header {
 
 header h1 {
   font-family: 'Press Start 2P', cursive;
-  font-size: 1.5em;
+  font-size: clamp(1.1rem, 1.4vw + 0.9rem, 1.7rem);
   letter-spacing: 2px;
   color: var(--primary-color);
   animation: textPulse 2s infinite;
@@ -129,7 +151,7 @@ header h1 {
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
-  gap: 16px;
+  gap: var(--space-md);
 }
 
 .header-subtitle {
@@ -179,7 +201,7 @@ a:hover {
 .container {
   max-width: var(--max-width);
   margin: 24px auto;
-  padding: 16px;
+  padding: var(--space-md);
 }
 
 .center {
@@ -190,19 +212,33 @@ a:hover {
 .command-card,
 .score-card {
   background: linear-gradient(140deg, var(--surface), rgba(20, 20, 20, 0.98));
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--card-border);
   border-radius: var(--border-radius-lg);
   box-shadow: var(--shadow-lg);
-  padding: 22px;
+  padding: var(--space-lg);
   margin-bottom: 20px;
   transition: background-color var(--transition-speed), box-shadow 0.3s ease, transform 0.3s ease;
   transform: translateY(var(--float-offset, 0px));
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before,
+.command-card::before,
+.score-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, rgba(255, 204, 0, 0.08), transparent 40%, rgba(70, 190, 255, 0.08));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
 }
 
 .content-grid {
   display: grid;
-  gap: 22px;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--space-lg);
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
 }
 
 .content-grid > .card,
@@ -220,7 +256,13 @@ a:hover {
 .command-card:hover,
 .score-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 18px 35px rgba(0, 0, 0, 0.55);
+  box-shadow: var(--elevation);
+}
+
+.card:hover::before,
+.command-card:hover::before,
+.score-card:hover::before {
+  opacity: 1;
 }
 
 .auth-card {
@@ -248,11 +290,12 @@ a:hover {
 }
 
 .auth-grid input {
-  padding: 8px 10px;
+  padding: 10px 12px;
   border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.12);
   background-color: rgba(12, 12, 12, 0.8);
   color: var(--text-color);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .auth-grid input:focus,
@@ -388,7 +431,7 @@ a:hover {
 .progress-bar {
   height: 20px;
   width: 0%;
-  background: var(--highlight-color);
+  background: linear-gradient(120deg, var(--highlight-color), rgba(255, 160, 70, 0.95));
   transition: width 0.5s ease;
 }
 
@@ -461,7 +504,7 @@ input[type='checkbox'] {
 }
 
 .file-btn {
-  padding: 10px 18px;
+  padding: 10px 20px;
   margin: 5px;
   background: linear-gradient(135deg, rgba(255, 204, 0, 0.95), rgba(255, 176, 77, 0.95));
   color: #111;
@@ -469,6 +512,7 @@ input[type='checkbox'] {
   border-radius: 999px;
   cursor: pointer;
   transition: background var(--transition-speed), transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25);
 }
 
 .file-btn.ghost {
@@ -480,7 +524,11 @@ input[type='checkbox'] {
 .file-btn:hover {
   background: var(--highlight-color);
   transform: translateY(-2px);
-  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.35);
+  box-shadow: var(--glow);
+}
+
+.file-btn:active {
+  transform: translateY(0);
 }
 
 .file-btn:focus-visible {
@@ -497,12 +545,13 @@ input[type='checkbox'] {
 .coin-game-input,
 .math-input {
   width: min(520px, 100%);
-  padding: 10px;
+  padding: 12px;
   margin-bottom: 10px;
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 12px;
   background: rgba(12, 12, 12, 0.9);
   color: var(--text-color);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .command-output,
@@ -525,6 +574,7 @@ input[type='checkbox'] {
   background: var(--surface-highlight);
   border: 1px solid rgba(255, 204, 0, 0.4);
   text-align: center;
+  box-shadow: var(--shadow);
 }
 
 .coin-status {
@@ -553,12 +603,14 @@ input[type='checkbox'] {
 .modal-content {
   background-color: var(--surface);
   margin: 10% auto;
-  padding: 20px;
+  padding: var(--space-lg);
   border: 1px solid rgba(255, 255, 255, 0.12);
   width: 90%;
   max-width: 600px;
   border-radius: var(--border-radius-lg);
   text-align: center;
+  box-shadow: var(--elevation);
+  backdrop-filter: blur(10px);
 }
 
 .modal-content button {
@@ -584,7 +636,7 @@ input[type='checkbox'] {
   border-radius: var(--border-radius-lg);
   margin: 20px 0;
   overflow: hidden;
-  padding: 10px;
+  padding: var(--space-sm);
   background: rgba(10, 10, 10, 0.6);
 }
 
@@ -697,6 +749,9 @@ input[type='checkbox'] {
   display: block;
   margin: 20px auto;
   max-width: 100%;
+  border-radius: var(--border-radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: var(--shadow);
 }
 
 #notesWindow {
@@ -786,7 +841,7 @@ input[type='checkbox'] {
     var(--highlight-color) var(--brake-level, 45%),
     rgba(255, 255, 255, 0.08) 0
   );
-  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.6);
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.6), var(--glow);
   position: relative;
 }
 
@@ -867,6 +922,7 @@ footer {
   color: #111;
   border-radius: var(--border-radius-lg);
   margin-top: 20px;
+  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.35);
 }
 
 footer .social-links a {
@@ -896,8 +952,8 @@ footer .social-links a:hover {
   }
 
   .container {
-    padding: 10px;
-    max-width: 90%;
+    padding: var(--space-sm);
+    max-width: 94%;
   }
 
   h1 {
@@ -911,7 +967,7 @@ footer .social-links a:hover {
   .card,
   .command-card,
   .score-card {
-    padding: 15px;
+    padding: var(--space-md);
   }
 
   input[type='checkbox'] {
@@ -919,11 +975,36 @@ footer .social-links a:hover {
   }
 
   .window {
-    width: 90%;
+    width: 100%;
+    position: relative;
+    left: 0;
+    top: 0;
+    margin-bottom: var(--space-md);
   }
 
   #ai-loop,
   .file-btn {
     font-size: 0.7em;
+  }
+
+  .header-shell {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .header-actions {
+    justify-content: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
