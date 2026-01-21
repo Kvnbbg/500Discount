@@ -20,7 +20,7 @@ export const createLogger = (level = 'info') => {
       timestamp: new Date().toISOString(),
     };
 
-    const output = console[levelName] || console.log;
+    const output = console[levelName] || console.info;
     output(payload);
   };
 

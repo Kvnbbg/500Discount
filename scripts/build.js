@@ -72,16 +72,21 @@ const writeRuntimeConfig = (config) => {
 };
 
 const main = () => {
-  const baseConfig = readJson(configPath);
-  const envConfig = {
-    ...parseEnvFile(envPath),
-    ...process.env,
-  };
+  try {
+    const baseConfig = readJson(configPath);
+    const envConfig = {
+      ...parseEnvFile(envPath),
+      ...process.env,
+    };
 
-  const finalConfig = applyOverrides(baseConfig, envConfig);
-  writeRuntimeConfig(finalConfig);
-
-  console.log('Runtime config generated at assets/js/runtime-config.js');
+    const finalConfig = applyOverrides(baseConfig, envConfig);
+    writeRuntimeConfig(finalConfig);
+    process.stdout.write('Runtime config generated at assets/js/runtime-config.js\n');
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    process.stderr.write(`Failed to generate runtime config: ${message}\n`);
+    process.exitCode = 1;
+  }
 };
 
 main();
