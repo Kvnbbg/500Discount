@@ -13,6 +13,30 @@ const config = getAppConfig();
 const logger = createLogger(config.logLevel);
 
 const supportedLanguages = ['en', 'fr'];
+const UI_CONSTANTS = {
+  aiFadeMs: 500,
+  questPulseMs: 300,
+  questSwapMs: 600,
+  questScoreDelta: 10,
+  easterEggScoreBonus: 50,
+  coinGameRunningLabel: 'Running...',
+  coinGameStartLabel: 'Start Game',
+  coinGameReadyStatus: 'Ready to combine coins. Enter values to start.',
+  authMinimumPasswordLength: 8,
+  brake: {
+    pressureMin: 0,
+    pressureMax: 100,
+    whiteoutThreshold: 80,
+    aggressiveThreshold: 50,
+    whiteoutDurationMs: 700,
+    tempBase: 260,
+    tempMultiplier: 2.1,
+  },
+  cardRevealThreshold: 0.2,
+  cardFloatAmplitude: 5,
+  cardFloatFrequency: 0.5,
+  cardFloatPhaseDivisor: 6,
+};
 let currentLanguage = readStorageValue('language', 'en');
 
 const translations = {
@@ -52,6 +76,8 @@ const translations = {
     authWelcome: 'Welcome back',
     authRegisterSuccess: 'Registration complete. You are now signed in.',
     authRegisterExists: 'An account with that email already exists.',
+    authRegisterInvalid: 'Check your name, email, and password to continue.',
+    authRegisterWeakPassword: 'Password must be at least 8 characters.',
     authLoginInvalid: 'Login failed. Check your email and password.',
     authLoginSuccess: 'Signed in successfully.',
     authLogout: 'Signed out. See you soon!',
@@ -144,6 +170,8 @@ const translations = {
     authWelcome: 'Bon retour',
     authRegisterSuccess: 'Inscription réussie. Vous êtes connecté.',
     authRegisterExists: 'Un compte avec cet email existe déjà.',
+    authRegisterInvalid: 'Vérifiez votre nom, email et mot de passe.',
+    authRegisterWeakPassword: 'Le mot de passe doit contenir 8 caractères minimum.',
     authLoginInvalid: 'Connexion échouée. Vérifiez vos identifiants.',
     authLoginSuccess: 'Connexion réussie.',
     authLogout: 'Déconnecté. À bientôt !',
@@ -232,6 +260,34 @@ const getTranslation = (lang, key) =>
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+const buildLabeledRow = (label, value, { tag = 'div', className } = {}) => {
+  const container = document.createElement(tag);
+  if (className) {
+    container.className = className;
+  }
+  const strong = document.createElement('strong');
+  strong.textContent = `${label}:`;
+  container.append(strong, ` ${value}`);
+  return container;
+};
+
+const appendCoinLogEntry = (coinLog, message, { strong = false } = {}) => {
+  if (!coinLog) {
+    return;
+  }
+  const entry = document.createElement('p');
+  if (strong) {
+    const strongEl = document.createElement('strong');
+    strongEl.textContent = message;
+    entry.appendChild(strongEl);
+  } else {
+    entry.textContent = message;
+  }
+  coinLog.appendChild(entry);
+};
+
+const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
 const setStatusMessage = (element, message) => {
   if (element) {
     element.textContent = message;
@@ -246,13 +302,15 @@ const initAiLoop = (aiLoopElement, getMessages) => {
   let aiIndex = 0;
 
   const updateAiMessage = () => {
-    const aiMessages = getMessages();
+    const resolvedMessages = getMessages();
+    const aiMessages =
+      Array.isArray(resolvedMessages) && resolvedMessages.length > 0 ? resolvedMessages : [''];
     aiLoopElement.classList.add('fade');
     setTimeout(() => {
       aiLoopElement.textContent = aiMessages[aiIndex];
       aiLoopElement.classList.remove('fade');
       aiIndex = (aiIndex + 1) % aiMessages.length;
-    }, 500);
+    }, UI_CONSTANTS.aiFadeMs);
   };
 
   aiLoopElement.addEventListener('click', updateAiMessage);
@@ -384,16 +442,17 @@ const renderEvData = (container, lang) => {
 
     const meta = document.createElement('div');
     meta.className = 'data-meta';
-    meta.innerHTML = `
-      <div><strong>${getTranslation(lang, 'evRange')}:</strong> ${car.range}</div>
-      <div><strong>${getTranslation(lang, 'evPower')}:</strong> ${car.power}</div>
-      <div><strong>${getTranslation(lang, 'evZeroToHundred')}:</strong> ${car.zeroToHundred}</div>
-      <div><strong>${getTranslation(lang, 'evTopSpeed')}:</strong> ${car.topSpeed}</div>
-    `;
+    meta.append(
+      buildLabeledRow(getTranslation(lang, 'evRange'), car.range),
+      buildLabeledRow(getTranslation(lang, 'evPower'), car.power),
+      buildLabeledRow(getTranslation(lang, 'evZeroToHundred'), car.zeroToHundred),
+      buildLabeledRow(getTranslation(lang, 'evTopSpeed'), car.topSpeed)
+    );
 
-    const note = document.createElement('p');
-    note.className = 'data-meta';
-    note.innerHTML = `<strong>${getTranslation(lang, 'evNote')}:</strong> ${car.note}`;
+    const note = buildLabeledRow(getTranslation(lang, 'evNote'), car.note, {
+      tag: 'p',
+      className: 'data-meta',
+    });
 
     card.append(title, meta, note);
     container.appendChild(card);
@@ -416,11 +475,13 @@ const renderRallyData = (container, lang) => {
 
     const highlight = document.createElement('div');
     highlight.className = 'data-meta';
-    highlight.innerHTML = `<strong>${getTranslation(lang, 'rallyHighlight')}:</strong> ${event.highlight}`;
+    highlight.append(
+      buildLabeledRow(getTranslation(lang, 'rallyHighlight'), event.highlight, { tag: 'span' })
+    );
 
     const window = document.createElement('div');
     window.className = 'data-meta';
-    window.innerHTML = `<strong>${getTranslation(lang, 'rallyWindow')}:</strong> ${event.window}`;
+    window.append(buildLabeledRow(getTranslation(lang, 'rallyWindow'), event.window, { tag: 'span' }));
 
     card.append(title, highlight, window);
     container.appendChild(card);
@@ -467,7 +528,8 @@ const initAuth = async ({ authStatus, authBadge, logoutBtn, registerForm, loginF
   const readUsers = () => {
     const raw = readStorageValue('authUsers', '[]');
     try {
-      return JSON.parse(raw);
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [];
     } catch (error) {
       return [];
     }
@@ -556,7 +618,13 @@ const initAuth = async ({ authStatus, authBadge, logoutBtn, registerForm, loginF
     const email = registerForm.querySelector('#registerEmail')?.value.trim().toLowerCase();
     const password = registerForm.querySelector('#registerPassword')?.value;
 
-    if (!name || !email || !password) {
+    if (!name || !email || !password || !isValidEmail(email)) {
+      applyAuthState(null, 'authRegisterInvalid');
+      return;
+    }
+
+    if (password.length < UI_CONSTANTS.authMinimumPasswordLength) {
+      applyAuthState(null, 'authRegisterWeakPassword');
       return;
     }
 
@@ -579,6 +647,11 @@ const initAuth = async ({ authStatus, authBadge, logoutBtn, registerForm, loginF
     event.preventDefault();
     const email = loginForm.querySelector('#loginEmail')?.value.trim().toLowerCase();
     const password = loginForm.querySelector('#loginPassword')?.value;
+
+    if (!email || !password || !isValidEmail(email)) {
+      applyAuthState(null, 'authLoginInvalid');
+      return;
+    }
 
     const users = readUsers();
     const user = users.find((entry) => entry.email === email);
@@ -649,15 +722,15 @@ const initQuests = ({ checkboxes, progressBar, scoreDisplay }) => {
         setTimeout(() => {
           if (checkbox.checked) {
             label.classList.add('done');
-            updateScore(10);
+            updateScore(UI_CONSTANTS.questScoreDelta);
           } else {
             label.classList.remove('done');
-            updateScore(-10);
+            updateScore(-UI_CONSTANTS.questScoreDelta);
           }
           label.classList.remove('swap-clean');
           updateProgress();
-        }, 600);
-      }, 300);
+        }, UI_CONSTANTS.questSwapMs);
+      }, UI_CONSTANTS.questPulseMs);
     }
   };
 
@@ -675,7 +748,7 @@ const initQuests = ({ checkboxes, progressBar, scoreDisplay }) => {
           setTimeout(() => {
             label.classList.remove('swap-clean', 'done');
             updateProgress();
-          }, 600);
+          }, UI_CONSTANTS.questSwapMs);
         }
       }
     });
@@ -750,7 +823,9 @@ const initCoinGame = ({
   const setRunningState = (running) => {
     isRunning = running;
     startCoinGameBtn.disabled = running;
-    startCoinGameBtn.textContent = running ? 'Running...' : 'Start Game';
+    startCoinGameBtn.textContent = running
+      ? UI_CONSTANTS.coinGameRunningLabel
+      : UI_CONSTANTS.coinGameStartLabel;
   };
 
   const runCoinGame = async () => {
@@ -776,7 +851,7 @@ const initCoinGame = ({
     setRunningState(true);
     setStatusMessage(coinStatus, 'Calculating optimal merges...');
     if (coinLog) {
-      coinLog.innerHTML = '';
+      coinLog.replaceChildren();
     }
 
     try {
@@ -791,9 +866,9 @@ const initCoinGame = ({
             ? 'All coins already meet the threshold.'
             : 'Not enough coins to reach the threshold.'
         );
-        if (coinLog) {
-          coinLog.innerHTML = `<p><strong>Minimum operations required: ${result.operations}</strong></p>`;
-        }
+        appendCoinLogEntry(coinLog, `Minimum operations required: ${result.operations}`, {
+          strong: true,
+        });
         return;
       }
 
@@ -805,9 +880,10 @@ const initCoinGame = ({
           break;
         }
         workingCoins.push(step.newCoin);
-        if (coinLog) {
-          coinLog.innerHTML += `<p>Operation ${index + 1}: Combined ${x} and ${y} to create ${step.newCoin}</p>`;
-        }
+        appendCoinLogEntry(
+          coinLog,
+          `Operation ${index + 1}: Combined ${x} and ${y} to create ${step.newCoin}`
+        );
         await sleep(config.coinGameStepDelayMs);
         renderCoins(coinDisplay, workingCoins);
       }
@@ -818,9 +894,9 @@ const initCoinGame = ({
           ? 'Threshold reached!'
           : 'Unable to reach threshold with the provided coins.'
       );
-      if (coinLog) {
-        coinLog.innerHTML += `<p><strong>Minimum operations required: ${result.operations}</strong></p>`;
-      }
+      appendCoinLogEntry(coinLog, `Minimum operations required: ${result.operations}`, {
+        strong: true,
+      });
     } catch (error) {
       handleError({
         error,
@@ -883,14 +959,14 @@ const initBrakeLab = ({
     whiteoutOverlay.classList.add('active');
     setTimeout(() => {
       whiteoutOverlay.classList.remove('active');
-    }, 700);
+    }, UI_CONSTANTS.brake.whiteoutDurationMs);
   };
 
   const getFeedbackKey = () => {
-    if (state.pressure >= 80) {
+    if (state.pressure >= UI_CONSTANTS.brake.whiteoutThreshold) {
       return 'brakeFeedbackWhiteout';
     }
-    if (state.pressure >= 50) {
+    if (state.pressure >= UI_CONSTANTS.brake.aggressiveThreshold) {
       return 'brakeFeedbackAggressive';
     }
     return 'brakeFeedbackStable';
@@ -899,13 +975,18 @@ const initBrakeLab = ({
   const updateSignal = () => {
     let signalKey = 'brakeSignalIdle';
     if (state.isBraking) {
-      signalKey = state.pressure >= 80 ? 'brakeSignalWhiteout' : 'brakeSignalActive';
+      signalKey =
+        state.pressure >= UI_CONSTANTS.brake.whiteoutThreshold
+          ? 'brakeSignalWhiteout'
+          : 'brakeSignalActive';
     }
     brakeSignal.textContent = getTranslation(currentLanguage, signalKey);
   };
 
   const updateMetrics = () => {
-    const temp = Math.round(260 + state.pressure * 2.1);
+    const temp = Math.round(
+      UI_CONSTANTS.brake.tempBase + state.pressure * UI_CONSTANTS.brake.tempMultiplier
+    );
     brakeTemp.textContent = `${temp}°C`;
     brakeFeedback.textContent = getTranslation(currentLanguage, getFeedbackKey());
     absStatus.textContent = getTranslation(
@@ -915,7 +996,11 @@ const initBrakeLab = ({
   };
 
   const updateGauge = () => {
-    const pressure = clamp(state.pressure, 0, 100);
+    const pressure = clamp(
+      state.pressure,
+      UI_CONSTANTS.brake.pressureMin,
+      UI_CONSTANTS.brake.pressureMax
+    );
     pressureValue.textContent = `${pressure}%`;
     gaugeValue.textContent = `${pressure}%`;
     gauge.style.setProperty('--brake-level', `${pressure}%`);
@@ -927,14 +1012,15 @@ const initBrakeLab = ({
   };
 
   pressureInput.addEventListener('input', (event) => {
-    state.pressure = Number(event.target.value);
+    const nextValue = Number.parseFloat(event.target?.value ?? '0');
+    state.pressure = Number.isNaN(nextValue) ? 0 : nextValue;
     updateGauge();
     updateMetrics();
     updateSignal();
   });
 
   absToggle.addEventListener('change', (event) => {
-    state.absEnabled = event.target.checked;
+    state.absEnabled = Boolean(event.target?.checked);
     updateMetrics();
   });
 
@@ -942,7 +1028,7 @@ const initBrakeLab = ({
     state.isBraking = true;
     updateMetrics();
     updateSignal();
-    if (state.pressure >= 80) {
+    if (state.pressure >= UI_CONSTANTS.brake.whiteoutThreshold) {
       triggerWhiteout();
     }
   });
@@ -1085,7 +1171,7 @@ const initMemo = () => {
         virtualFileContent.textContent = 'No memo saved yet.';
         return;
       }
-      virtualFileContent.innerHTML = '';
+      virtualFileContent.replaceChildren();
       const title = document.createElement('p');
       title.textContent = 'Your saved Mémo:';
       const body = document.createElement('p');
@@ -1248,7 +1334,7 @@ const initCardReveal = () => {
         }
       });
     },
-    { threshold: 0.2 }
+    { threshold: UI_CONSTANTS.cardRevealThreshold }
   );
 
   cards.forEach((card) => observer.observe(card));
@@ -1264,9 +1350,9 @@ const initCardAnimation = () => {
   const animateCards = () => {
     const time = Date.now() / 1000;
     cards.forEach((card, index) => {
-      const amplitude = 5;
-      const frequency = 0.5;
-      const phaseOffset = (index * Math.PI) / 6;
+      const amplitude = UI_CONSTANTS.cardFloatAmplitude;
+      const frequency = UI_CONSTANTS.cardFloatFrequency;
+      const phaseOffset = (index * Math.PI) / UI_CONSTANTS.cardFloatPhaseDivisor;
       const deltaY = amplitude * Math.sin(2 * Math.PI * frequency * time + phaseOffset);
       card.style.setProperty('--float-offset', `${deltaY}px`);
     });
@@ -1327,7 +1413,7 @@ const initApp = async () => {
   });
 
   const triggerEasterEgg = () => {
-    addScore(50);
+    addScore(UI_CONSTANTS.easterEggScoreBonus);
     if (easterModal) {
       easterModal.style.display = 'block';
     }
@@ -1401,7 +1487,7 @@ const initApp = async () => {
     resetBtn.addEventListener('click', resetTasks);
   }
 
-  setStatusMessage(coinStatus, 'Ready to combine coins. Enter values to start.');
+  setStatusMessage(coinStatus, UI_CONSTANTS.coinGameReadyStatus);
 
   window.TokyoTCG = {
     resetQuests: resetTasks,
