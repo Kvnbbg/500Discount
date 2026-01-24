@@ -231,6 +231,17 @@
         </form>
       </div>
       <button class="file-btn ghost" id="logoutBtn" type="button" hidden data-i18n="logoutButton">Sign out</button>
+      <section class="auth-manage" id="authManageSection" hidden>
+        <h3 data-i18n="authManageTitle">Manage Profile</h3>
+        <form id="manageForm">
+          <label for="manageName" data-i18n="authManageLabel">Display name</label>
+          <input id="manageName" type="text" required data-i18n-placeholder="authManagePlaceholder" placeholder="Update your display name">
+          <div class="auth-manage-actions">
+            <button class="file-btn" type="submit" data-i18n="authUpdateButton">Update Profile</button>
+            <button class="file-btn ghost danger" id="deleteAccountBtn" type="button" data-i18n="authDeleteButton">Delete Account</button>
+          </div>
+        </form>
+      </section>
       <p class="auth-footnote" data-i18n="authFootnote">
         Local SQL-style vault for now; serverless database coming soon.
       </p>
