@@ -20,7 +20,7 @@ export const safeEvaluateExpression = (expression) => {
     }
 
     return { ok: true, value: result };
-  } catch (error) {
+  } catch {
     return { ok: false, error: 'Invalid expression. Check your syntax.' };
   }
 };

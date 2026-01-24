@@ -7,6 +7,7 @@ import {
   parseThreshold,
 } from './utils/coin-game.js';
 import { safeEvaluateExpression } from './utils/math.js';
+import { createAuthStore } from './utils/auth-store.js';
 import { readStorageValue, writeStorageValue } from './utils/storage.js';
 
 const config = getAppConfig();
@@ -82,6 +83,17 @@ const translations = {
     authLoginSuccess: 'Signed in successfully.',
     authLogout: 'Signed out. See you soon!',
     authUnlockTooltip: 'Register or sign in to unlock this feature.',
+    authManageTitle: 'Manage Profile',
+    authManageLabel: 'Display name',
+    authManagePlaceholder: 'Update your display name',
+    authUpdateButton: 'Update Profile',
+    authDeleteButton: 'Delete Account',
+    authUpdateSuccess: 'Profile updated successfully.',
+    authUpdateInvalid: 'Enter a valid display name to continue.',
+    authUpdateMissing: 'Session expired. Please sign in again.',
+    authDeleteConfirm: 'Delete your local account? This cannot be undone.',
+    authDeleteSuccess: 'Your account has been deleted locally.',
+    authDeleteMissing: 'Account not found. Try signing in again.',
     evDataTitle: 'Electric Car Intelligence',
     evDataSubtitle: 'Curated specs from leading EV makers, tuned for quick comparison.',
     rallyTitle: 'Rally Signal (2024/2025)',
@@ -176,6 +188,17 @@ const translations = {
     authLoginSuccess: 'Connexion réussie.',
     authLogout: 'Déconnecté. À bientôt !',
     authUnlockTooltip: 'Inscrivez-vous ou connectez-vous pour déverrouiller cette fonction.',
+    authManageTitle: 'Gérer le profil',
+    authManageLabel: "Nom d'affichage",
+    authManagePlaceholder: 'Mettre à jour votre nom',
+    authUpdateButton: 'Mettre à jour',
+    authDeleteButton: 'Supprimer le compte',
+    authUpdateSuccess: 'Profil mis à jour avec succès.',
+    authUpdateInvalid: 'Saisissez un nom valide pour continuer.',
+    authUpdateMissing: 'Session expirée. Merci de vous reconnecter.',
+    authDeleteConfirm: 'Supprimer votre compte local ? Action irréversible.',
+    authDeleteSuccess: 'Votre compte a été supprimé localement.',
+    authDeleteMissing: "Compte introuvable. Reconnectez-vous s'il vous plaît.",
     evDataTitle: 'Intelligence voitures électriques',
     evDataSubtitle: 'Données clés des leaders EV pour comparer rapidement.',
     rallyTitle: 'Signal Rallye (2024/2025)',
@@ -520,71 +543,27 @@ const initLanguageToggle = ({
   return { applyLanguage };
 };
 
-const initAuth = async ({ authStatus, authBadge, logoutBtn, registerForm, loginForm, gatedButtons }) => {
+const initAuth = async ({
+  authStatus,
+  authBadge,
+  logoutBtn,
+  registerForm,
+  loginForm,
+  gatedButtons,
+  manageSection,
+  manageForm,
+  manageNameInput,
+  deleteAccountBtn,
+}) => {
   if (!authStatus || !authBadge || !logoutBtn || !registerForm || !loginForm) {
     return () => {};
   }
 
-  const readUsers = () => {
-    const raw = readStorageValue('authUsers', '[]');
-    try {
-      const parsed = JSON.parse(raw);
-      return Array.isArray(parsed) ? parsed : [];
-    } catch (error) {
-      return [];
-    }
-  };
-
-  const writeUsers = (users) => {
-    writeStorageValue('authUsers', JSON.stringify(users));
-  };
-
-  const base64Encode = (value) => {
-    const encoder = new TextEncoder();
-    const bytes = encoder.encode(value);
-    let binary = '';
-    bytes.forEach((byte) => {
-      binary += String.fromCharCode(byte);
-    });
-    return btoa(binary);
-  };
-
-  const hashPassword = async (password) => {
-    const cryptoApi = globalThis.crypto;
-    if (cryptoApi?.subtle) {
-      const encoder = new TextEncoder();
-      const data = encoder.encode(password);
-      const hash = await cryptoApi.subtle.digest('SHA-256', data);
-      return Array.from(new Uint8Array(hash))
-        .map((byte) => byte.toString(16).padStart(2, '0'))
-        .join('');
-    }
-
-    return base64Encode(password).split('').reverse().join('');
-  };
-
-  const getSession = () => {
-    const raw = readStorageValue('authSession', '');
-    if (!raw) {
-      return null;
-    }
-    try {
-      return JSON.parse(raw);
-    } catch (error) {
-      return null;
-    }
-  };
-
-  const setSession = (session) => {
-    writeStorageValue('authSession', JSON.stringify(session));
-  };
-
-  const clearSession = () => {
-    writeStorageValue('authSession', '');
-  };
+  const authStore = createAuthStore();
+  const gatedButtonsList = gatedButtons ? Array.from(gatedButtons) : [];
 
   const updateGatedButtons = (isAuthenticated) => {
-    gatedButtons.forEach((button) => {
+    gatedButtonsList.forEach((button) => {
       button.disabled = !isAuthenticated;
       button.setAttribute('aria-disabled', String(!isAuthenticated));
       button.title = isAuthenticated
@@ -605,6 +584,12 @@ const initAuth = async ({ authStatus, authBadge, logoutBtn, registerForm, loginF
     registerForm.hidden = isAuthenticated;
     loginForm.hidden = isAuthenticated;
     logoutBtn.hidden = !isAuthenticated;
+    if (manageSection) {
+      manageSection.hidden = !isAuthenticated;
+    }
+    if (manageNameInput) {
+      manageNameInput.value = session?.name ?? '';
+    }
     updateGatedButtons(isAuthenticated);
 
     if (messageKey) {
@@ -628,18 +613,13 @@ const initAuth = async ({ authStatus, authBadge, logoutBtn, registerForm, loginF
       return;
     }
 
-    const users = readUsers();
-    const exists = users.find((user) => user.email === email);
-    if (exists) {
+    const response = await authStore.registerUser({ name, email, password });
+    if (!response.ok && response.reason === 'exists') {
       applyAuthState(null, 'authRegisterExists');
       return;
     }
 
-    const passwordHash = await hashPassword(password);
-    users.push({ name, email, passwordHash, createdAt: new Date().toISOString() });
-    writeUsers(users);
-    setSession({ name, email, signedInAt: new Date().toISOString() });
-    applyAuthState(getSession(), 'authRegisterSuccess');
+    applyAuthState(response.session ?? authStore.getSession(), 'authRegisterSuccess');
     registerForm.reset();
   });
 
@@ -653,31 +633,67 @@ const initAuth = async ({ authStatus, authBadge, logoutBtn, registerForm, loginF
       return;
     }
 
-    const users = readUsers();
-    const user = users.find((entry) => entry.email === email);
-    if (!user) {
+    const response = await authStore.authenticateUser({ email, password });
+    if (!response.ok) {
       applyAuthState(null, 'authLoginInvalid');
       return;
     }
 
-    const passwordHash = await hashPassword(password);
-    if (passwordHash !== user.passwordHash) {
-      applyAuthState(null, 'authLoginInvalid');
-      return;
-    }
-
-    setSession({ name: user.name, email: user.email, signedInAt: new Date().toISOString() });
-    applyAuthState(getSession(), 'authLoginSuccess');
+    applyAuthState(response.session ?? authStore.getSession(), 'authLoginSuccess');
     loginForm.reset();
   });
 
   logoutBtn.addEventListener('click', () => {
-    clearSession();
+    authStore.clearSession();
     applyAuthState(null, 'authLogout');
   });
 
+  if (manageForm && manageNameInput) {
+    manageForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const session = authStore.getSession();
+      if (!session) {
+        applyAuthState(null);
+        return;
+      }
+
+      const nextName = manageNameInput.value.trim();
+      if (!nextName) {
+        applyAuthState(session, 'authUpdateInvalid');
+        return;
+      }
+
+      const response = authStore.updateProfile({ email: session.email, name: nextName });
+      const nextSession = response.session ?? authStore.getSession();
+      applyAuthState(nextSession, response.ok ? 'authUpdateSuccess' : 'authUpdateMissing');
+    });
+  }
+
+  if (deleteAccountBtn) {
+    deleteAccountBtn.addEventListener('click', () => {
+      const session = authStore.getSession();
+      if (!session) {
+        applyAuthState(null);
+        return;
+      }
+
+      const shouldDelete = window.confirm(getTranslation(currentLanguage, 'authDeleteConfirm'));
+      if (!shouldDelete) {
+        return;
+      }
+
+      const response = authStore.deleteProfile(session.email);
+      if (!response.ok) {
+        applyAuthState(authStore.getSession(), 'authDeleteMissing');
+        return;
+      }
+
+      applyAuthState(response.session, 'authDeleteSuccess');
+    });
+  }
+
   const refreshAuthState = () => {
-    applyAuthState(getSession());
+    applyAuthState(authStore.getSession());
   };
 
   refreshAuthState();
@@ -1259,7 +1275,7 @@ const isSafeExternalUrl = (url) => {
   try {
     const parsed = new URL(url, window.location.href);
     return ['http:', 'https:'].includes(parsed.protocol);
-  } catch (error) {
+  } catch {
     return false;
   }
 };
@@ -1404,6 +1420,10 @@ const initApp = async () => {
   const logoutBtn = document.getElementById('logoutBtn');
   const registerForm = document.getElementById('registerForm');
   const loginForm = document.getElementById('loginForm');
+  const manageSection = document.getElementById('authManageSection');
+  const manageForm = document.getElementById('manageForm');
+  const manageNameInput = document.getElementById('manageName');
+  const deleteAccountBtn = document.getElementById('deleteAccountBtn');
   const gatedButtons = document.querySelectorAll('[data-auth-required="true"]');
 
   const { resetTasks, validateNextTask, addScore } = initQuests({
@@ -1425,6 +1445,10 @@ const initApp = async () => {
     logoutBtn,
     registerForm,
     loginForm,
+    manageSection,
+    manageForm,
+    manageNameInput,
+    deleteAccountBtn,
     gatedButtons,
   });
 
