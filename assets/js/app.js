@@ -1401,6 +1401,7 @@ const initApp = async () => {
   const easterModal = document.getElementById('easterModal');
   const languageToggle = document.getElementById('languageToggle');
   const languageLabel = document.getElementById('languageLabel');
+  const themeToggleBtn = document.getElementById('themeToggle');
   const evDataGrid = document.getElementById('evDataGrid');
   const rallyList = document.getElementById('rallyList');
   const brakePressure = document.getElementById('brakePressure');
@@ -1478,6 +1479,9 @@ const initApp = async () => {
     },
   });
   initAiLoop(aiLoopElement, () => getAiMessages(currentLanguage));
+  if (themeToggleBtn) {
+    themeToggleBtn.addEventListener('click', toggleTheme);
+  }
   initMathCalculator({ mathInput, calcBtn, mathResult });
   initCoinGame({
     startCoinGameBtn,
