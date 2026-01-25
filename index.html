@@ -13,39 +13,496 @@
   <link href="assets/css/app.css" rel="stylesheet">
 </head>
 <body>
-  <header>
-    <div class="header-shell">
+  <header class="app-header">
+    <nav class="navbar" aria-label="Primary">
+      <div class="nav-left">
+        <a class="brand" href="#dashboard">Tokyo TCG Hub</a>
+        <span class="brand-subtitle">Star Bazaar</span>
+      </div>
+      <input type="checkbox" id="navToggle" class="nav-toggle-input" aria-hidden="true">
+      <label for="navToggle" class="nav-toggle-button" aria-label="Toggle navigation">
+        <span></span>
+        <span></span>
+        <span></span>
+      </label>
+      <div class="nav-center" id="navLinks">
+        <a class="nav-link" href="#dashboard">Dashboard</a>
+        <a class="nav-link" href="#quests">Quests</a>
+        <a class="nav-link" href="#labs">Labs</a>
+        <a class="nav-link" href="#deploy">Deploy</a>
+        <a class="nav-link" href="#tools">Tools</a>
+      </div>
+      <div class="nav-right">
+        <a class="nav-link nav-ghost" href="landing.html" data-i18n="headerLandingLink">Landing</a>
+        <button class="file-btn ghost small" id="themeToggle" type="button">Theme</button>
+        <button class="file-btn ghost small" id="languageToggle" type="button" aria-live="polite">
+          <span id="languageLabel">EN</span> / FR
+        </button>
+        <button class="file-btn ghost small" id="logoutBtn" type="button" hidden data-i18n="logoutButton">Sign out</button>
+      </div>
+    </nav>
+  </header>
+
+  <main class="dashboard" id="dashboard">
+    <section class="hero-section">
       <div>
         <h1 data-i18n="headerTitle">Tokyo TCG Hub &amp; Star Bazaar</h1>
-        <p class="header-subtitle" data-i18n="headerSubtitle">
+        <p class="hero-subtitle" data-i18n="headerSubtitle">
           Retro-futuristic quests, electric car labs, and rally data in one place.
         </p>
       </div>
-      <div class="header-actions">
-        <a class="file-btn ghost" href="landing.html" data-i18n="headerLandingLink">Landing</a>
-        <button class="file-btn ghost" id="languageToggle" type="button" aria-live="polite">
-          <span id="languageLabel">EN</span> / FR
+      <div class="hero-actions">
+        <button class="file-btn" data-open-modal="masterModal" data-auth-required="true" data-i18n="openControlPanel">
+          Open Control Panel
+        </button>
+        <button class="file-btn secondary" data-open-modal="storyModal" data-auth-required="true" data-i18n="quickHelp">
+          Quick Help
         </button>
       </div>
+    </section>
+
+    <div id="ai-loop" aria-live="polite">Kevin Marville: Initializing bazaar...</div>
+
+    <div class="status-banner" id="appStatus" role="status" aria-live="polite" data-i18n="statusWelcome">
+      Welcome back, explorer. Ready to tune your ride and conquer quests.
     </div>
-  </header>
 
-  <div id="ai-loop" aria-live="polite">Kevin Marville: Initializing bazaar...</div>
+    <section class="summary-grid" aria-label="Daily summary">
+      <div class="score-card">
+        Score: <span id="scoreDisplay">0</span>
+      </div>
+      <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+      <div class="card summary-card">
+        <h2>Mission Briefing</h2>
+        <p>
+          Review today’s objectives, validate your next quest, and launch the lab tools when you are ready.
+        </p>
+      </div>
+    </section>
 
-  <div class="status-banner" id="appStatus" role="status" aria-live="polite" data-i18n="statusWelcome">
-    Welcome back, explorer. Ready to tune your ride and conquer quests.
-  </div>
+    <section class="dashboard-grid">
+      <section class="dashboard-column">
+        <section class="section-block" id="overview">
+          <header class="section-header">
+            <h2>Mission Overview</h2>
+            <p>High-level guidance and featured highlights for the day.</p>
+          </header>
+          <div class="section-grid">
+            <div class="card">
+              <h2 data-i18n="welcomeTitle">Welcome to the Bazaar</h2>
+              <p data-i18n-html="welcomeBody">
+                At <strong>Tokyo TCG Hub &amp; Star Bazaar</strong>, your journey begins! Customize your electric ride, master futuristic tech, and embark on quests that transform routine tasks into epic adventures.
+              </p>
+            </div>
 
-  <div class="container">
-    <div class="center">
-      <button class="file-btn" data-open-modal="masterModal" data-auth-required="true" data-i18n="openControlPanel">
-        Open Control Panel
-      </button>
-      <button class="file-btn" data-open-modal="storyModal" data-auth-required="true" data-i18n="quickHelp">
-        Quick Help
-      </button>
-    </div>
-  </div>
+            <div class="card">
+              <h2 data-i18n="innovationTitle">Innovative Solutions ❤️</h2>
+              <p data-i18n="innovationBody">
+                Experience advanced tech with our futuristic customization tools, interactive challenges, and gamified upgrades that push your electric ride to the next level.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section-block" id="quests">
+          <header class="section-header">
+            <h2 data-i18n="questsTitle">Epic Quests</h2>
+            <p>Track the checklist and reset progress when needed.</p>
+          </header>
+          <div class="card">
+            <ul id="taskList">
+              <li>
+                <label>
+                  <input type="checkbox" class="task-checkbox">
+                  <strong>Quest: Assemble Your Card Deck</strong>
+                </label>
+                <ul class="subtask">
+                  <li>
+                    <label>
+                      <input type="checkbox" class="task-checkbox">
+                      Verify your deck is complete and every card is primed for battle.
+                    </label>
+                  </li>
+                  <li>
+                    <label>
+                      <input type="checkbox" class="task-checkbox">
+                      Activate all card powers for maximum impact.
+                    </label>
+                  </li>
+                </ul>
+              </li>
+              <li>
+                <label>
+                  <input type="checkbox" class="task-checkbox">
+                  <strong>Quest: Secure Your Tech Upgrades</strong>
+                </label>
+                <ul class="subtask">
+                  <li>
+                    <label>
+                      <input type="checkbox" class="task-checkbox">
+                      Confirm the latest firmware and system updates are installed.
+                    </label>
+                  </li>
+                  <li>
+                    <label>
+                      <input type="checkbox" class="task-checkbox">
+                      Check connectivity for tech boost features.
+                    </label>
+                  </li>
+                </ul>
+              </li>
+              <li>
+                <label>
+                  <input type="checkbox" class="task-checkbox">
+                  <strong>Quest: Tune Your Electric Ride</strong>
+                </label>
+                <ul class="subtask">
+                  <li>
+                    <label>
+                      <input type="checkbox" class="task-checkbox">
+                      Optimize performance settings for maximum efficiency.
+                    </label>
+                  </li>
+                  <li>
+                    <label>
+                      <input type="checkbox" class="task-checkbox">
+                      Calibrate your electric motor for peak performance.
+                    </label>
+                  </li>
+                </ul>
+              </li>
+              <li>
+                <label>
+                  <input type="checkbox" class="task-checkbox">
+                  <strong>Quest: Gather Battle Rewards</strong>
+                </label>
+                <ul class="subtask">
+                  <li>
+                    <label>
+                      <input type="checkbox" class="task-checkbox">
+                      Review your battle stats and achievements.
+                    </label>
+                  </li>
+                  <li>
+                    <label>
+                      <input type="checkbox" class="task-checkbox">
+                      Plan your next upgrade based on earned rewards.
+                    </label>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+            <button id="resetBtn" class="file-btn block">Reset Quests</button>
+          </div>
+        </section>
+
+        <section class="section-block" id="labs">
+          <header class="section-header">
+            <h2>Mobility Labs</h2>
+            <p>Explore EV intelligence, rally insights, and brake simulations.</p>
+          </header>
+          <div class="section-grid">
+            <div class="card" id="evDataCard">
+              <h2 data-i18n="evDataTitle">Electric Car Intelligence</h2>
+              <p data-i18n="evDataSubtitle">
+                Curated specs from leading EV makers, tuned for quick comparison.
+              </p>
+              <div id="evDataGrid" class="data-grid" aria-live="polite"></div>
+            </div>
+
+            <div class="card" id="rallyCard">
+              <h2 data-i18n="rallyTitle">Rally Signal (2024/2025)</h2>
+              <p data-i18n="rallySubtitle">
+                Latest rally highlights and series you can follow right now.
+              </p>
+              <div id="rallyList" class="rally-grid" aria-live="polite"></div>
+            </div>
+
+            <div class="card" id="brakeLabCard">
+              <h2 data-i18n="brakeLabTitle">Whiteout Braking Display</h2>
+              <p data-i18n="brakeLabSubtitle">
+                Simulate EV braking pressure, ABS assist, and watch the whiteout flash when braking hits peak load.
+              </p>
+              <div class="brake-grid">
+                <div class="brake-controls">
+                  <label for="brakePressure" data-i18n="brakePressureLabel">
+                    Brake pressure
+                  </label>
+                  <div class="brake-pressure-row">
+                    <input type="range" id="brakePressure" min="0" max="100" value="45">
+                    <span id="brakePressureValue" class="brake-pressure-value">45%</span>
+                  </div>
+                  <label class="brake-toggle">
+                    <input type="checkbox" id="absToggle" checked>
+                    <span data-i18n="brakeAbsToggle">ABS assist engaged</span>
+                  </label>
+                  <div class="brake-actions">
+                    <button class="file-btn" id="simulateBrake" data-i18n="brakeSimulateBtn">Simulate Brake</button>
+                    <button class="file-btn ghost small" id="releaseBrake" data-i18n="brakeReleaseBtn">Release</button>
+                  </div>
+                </div>
+                <div class="brake-display">
+                  <div class="brake-gauge" id="brakeGauge">
+                    <span class="brake-gauge-value" id="brakeGaugeValue">45%</span>
+                    <span class="brake-gauge-label" data-i18n="brakeGaugeLabel">Brake Pressure</span>
+                  </div>
+                  <div class="brake-metrics">
+                    <div>
+                      <span data-i18n="brakeAbsLabel">ABS</span>:
+                      <strong id="absStatus">ON</strong>
+                    </div>
+                    <div>
+                      <span data-i18n="brakeTempLabel">Rotor temp</span>:
+                      <strong id="brakeTemp">320°C</strong>
+                    </div>
+                    <div>
+                      <span data-i18n="brakeFeedbackLabel">Feedback</span>:
+                      <strong id="brakeFeedback">Stable</strong>
+                    </div>
+                  </div>
+                  <div id="brakeSignal" class="brake-signal" role="status" aria-live="polite"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section-block" id="deploy">
+          <header class="section-header">
+            <h2 data-i18n="vercelTitle">Vercel-ready Car Templates</h2>
+            <p data-i18n="vercelIntro">
+              Vanilla JS car templates deploy as static sites on Vercel—just HTML, CSS, and JS files with no build step.
+            </p>
+          </header>
+          <div class="card" id="vercelCard">
+            <div class="template-grid">
+              <article class="template-card">
+                <h3 data-i18n="templateCanvasTitle">Canvas Car Racer</h3>
+                <p data-i18n="templateCanvasBody">
+                  Pure Canvas driving sim with sprite swaps for city or campaign branding.
+                </p>
+              </article>
+              <article class="template-card">
+                <h3 data-i18n="templateThreeTitle">Three.js Car Viewer</h3>
+                <p data-i18n="templateThreeBody">
+                  Lightweight GLTF loader with orbit controls for interactive 3D showcases.
+                </p>
+              </article>
+              <article class="template-card">
+                <h3 data-i18n="templateSvgTitle">SVG Car Animator</h3>
+                <p data-i18n="templateSvgBody">
+                  Minimal SVG path animation for 2D top-down routes and fleet tracking.
+                </p>
+              </article>
+            </div>
+            <h3 data-i18n="vercelStepsTitle">Deploy to Vercel in Minutes</h3>
+            <ol class="steps-list">
+              <li data-i18n="vercelStepOne">
+                Create an <code>index.html</code> with scripts, add <code>style.css</code>, and keep assets in the repo root.
+              </li>
+              <li data-i18n="vercelStepTwo">
+                Optional: add <code>vercel.json</code> to rewrite all routes to <code>index.html</code>.
+              </li>
+              <li data-i18n="vercelStepThree">
+                Push to GitHub and import the repo in Vercel for instant static deploys.
+              </li>
+            </ol>
+            <h3 data-i18n="vercelTipsTitle">Quick Customization Tips</h3>
+            <ul class="tips-list">
+              <li data-i18n="vercelTipOne">
+                Swap in free GLTF cars (Sketchfab) and adjust materials for city lighting.
+              </li>
+              <li data-i18n="vercelTipTwo">
+                Overlay campaign stats and delivery milestones directly on the HUD.
+              </li>
+              <li data-i18n="vercelTipThree">
+                Test locally with <code>npx serve</code>, then push to redeploy.
+              </li>
+            </ul>
+          </div>
+        </section>
+      </section>
+
+      <aside class="dashboard-column" id="tools">
+        <section class="section-block" id="community">
+          <header class="section-header">
+            <h2 data-i18n="authTitle">Join the Family</h2>
+            <p>Secure access to the control panel and 3D lab.</p>
+          </header>
+          <div class="card auth-card" id="authCard">
+            <div class="auth-header">
+              <h2 data-i18n="authTitle">Join the Family</h2>
+              <span class="status-pill" id="authBadge" data-i18n="authBadgeGuest">Guest</span>
+            </div>
+            <p id="authStatus" data-i18n="authPrompt">
+              Create your secure profile to unlock the control panel and 3D lab.
+            </p>
+            <div class="auth-grid">
+              <form id="registerForm">
+                <h3 data-i18n="registerTitle">Create Account</h3>
+                <label for="registerName" data-i18n="labelName">Name</label>
+                <input id="registerName" type="text" required data-i18n-placeholder="placeholderName" placeholder="Your name">
+                <label for="registerEmail" data-i18n="labelEmail">Email</label>
+                <input id="registerEmail" type="email" required data-i18n-placeholder="placeholderEmail" placeholder="name@example.com">
+                <label for="registerPassword" data-i18n="labelPassword">Password</label>
+                <input id="registerPassword" type="password" required data-i18n-placeholder="placeholderPassword" placeholder="8+ characters">
+                <button class="file-btn" type="submit" data-i18n="registerButton">Register</button>
+              </form>
+              <form id="loginForm">
+                <h3 data-i18n="loginTitle">Sign In</h3>
+                <label for="loginEmail" data-i18n="labelEmail">Email</label>
+                <input id="loginEmail" type="email" required data-i18n-placeholder="placeholderEmail" placeholder="name@example.com">
+                <label for="loginPassword" data-i18n="labelPassword">Password</label>
+                <input id="loginPassword" type="password" required data-i18n-placeholder="placeholderPassword" placeholder="Your password">
+                <button class="file-btn" type="submit" data-i18n="loginButton">Sign In</button>
+              </form>
+            </div>
+            <section class="auth-manage" id="authManageSection" hidden>
+              <h3 data-i18n="authManageTitle">Manage Profile</h3>
+              <form id="manageForm">
+                <label for="manageName" data-i18n="authManageLabel">Display name</label>
+                <input id="manageName" type="text" required data-i18n-placeholder="authManagePlaceholder" placeholder="Update your display name">
+                <div class="auth-manage-actions">
+                  <button class="file-btn" type="submit" data-i18n="authUpdateButton">Update Profile</button>
+                  <button class="file-btn ghost small danger" id="deleteAccountBtn" type="button" data-i18n="authDeleteButton">Delete Account</button>
+                </div>
+              </form>
+            </section>
+            <p class="auth-footnote" data-i18n="authFootnote">
+              Local SQL-style vault for now; serverless database coming soon.
+            </p>
+          </div>
+        </section>
+
+        <section class="section-block" id="utility">
+          <header class="section-header">
+            <h2>Challenges &amp; Utility</h2>
+            <p>Streamlined tools grouped for quick access.</p>
+          </header>
+          <div class="section-grid">
+            <div class="card" id="coinGameCard">
+              <h2>Coin Game Challenge</h2>
+              <div>
+                <label for="coinsInput">Enter your coins (comma-separated):</label><br>
+                <input type="text" id="coinsInput" class="coin-game-input" placeholder="ex: 2,11,10,1,3">
+              </div>
+              <div>
+                <label for="thresholdInput">Threshold k:</label><br>
+                <input type="number" id="thresholdInput" class="coin-game-input" placeholder="ex: 10">
+              </div>
+              <button class="file-btn" id="startCoinGame">Start Game</button>
+              <div id="coinStatus" class="coin-status" role="status" aria-live="polite"></div>
+              <div id="coinError" class="coin-error" role="alert"></div>
+              <div id="coinDisplay" class="coin-display"></div>
+              <div id="coinLog" class="coin-log"></div>
+              <div class="container">
+                <p>
+                  Combine your coins using the formula <em>min(x, y) * 2 + max(x, y)</em> until all coins are at or above the threshold <strong>k</strong>.
+                </p>
+                <span class="popup-alert" id="popupAlert">
+                  Alert: An unexpected glitch occurred overnight. Our technicians are enhancing your experience.
+                </span>
+              </div>
+            </div>
+
+            <div class="card">
+              <h2>Math Calculator</h2>
+              <p>Enter a mathematical expression:</p>
+              <input type="text" id="mathInput" class="math-input" placeholder="Example: 2+3*4">
+              <br>
+              <button id="calcBtn" class="file-btn">Calculate</button>
+              <p id="mathResult" class="math-result"></p>
+            </div>
+
+            <div class="command-card">
+              <h2>Keyboard Commands &amp; Theme</h2>
+              <p>
+                Use shortcuts to interact:<br>
+                • <strong>Alt+R</strong>: Reset quests<br>
+                • <strong>Alt+N</strong>: Validate next quest<br>
+                • <strong>Alt+T</strong>: Toggle theme<br>
+                Or type a command below (try <code>help</code>):
+              </p>
+              <input
+                type="text"
+                id="commandInput"
+                data-i18n-placeholder="commandPlaceholder"
+                placeholder="Type 'reset', 'next', 'toggle', or '--help'"
+              >
+              <div id="commandOutput" class="command-output" role="status" aria-live="polite"></div>
+            </div>
+
+            <div class="card">
+              <h2>File Management</h2>
+              <div class="center">
+                <button class="file-btn secondary" data-file-action="Open">Open</button>
+                <button class="file-btn secondary" data-file-action="Organize">Organize</button>
+                <button class="file-btn secondary" data-file-action="Clean">Clean</button>
+                <button class="file-btn secondary" data-file-action="Delete">Delete</button>
+                <button class="file-btn secondary" data-file-action="Hide">Hide</button>
+                <button class="file-btn secondary" data-file-action="Archive">Archive</button>
+              </div>
+              <div id="fileLog"></div>
+            </div>
+
+            <div class="card">
+              <h2>Miscellaneous Data</h2>
+              <div class="folder" role="button" aria-expanded="false" data-folder-toggle="folderDrawings">📁 Drawings</div>
+              <div id="folderDrawings" class="folder-content">
+                <p>
+                  Welcome, brave artist! These drawings are epic quests sketched by the hand of destiny.
+                </p>
+              </div>
+              <div class="folder" role="button" aria-expanded="false" data-folder-toggle="folderMemos">📁 Memos</div>
+              <div id="folderMemos" class="folder-content">
+                <p>
+                  Greetings, strategist! These memos hold secret tips and plans for your next upgrade.
+                </p>
+              </div>
+              <div class="folder" role="button" aria-expanded="false" data-folder-toggle="folderBooks">📁 Books</div>
+              <div id="folderBooks" class="folder-content">
+                <p>
+                  Knight of knowledge, dive into these legendary books—each page is an adventure.
+                </p>
+              </div>
+              <div class="folder" role="button" aria-expanded="false" data-folder-toggle="folderMusic">📁 Music</div>
+              <div id="folderMusic" class="folder-content">
+                <p>
+                  Get ready for mesmerizing tunes that turn every quest into an epic dance.
+                </p>
+              </div>
+            </div>
+
+            <div class="card">
+              <h2>Some time as Mémo</h2>
+              <div id="desktop">
+                <div class="window" id="notesWindow">
+                  <div class="window-header">Mémo</div>
+                  <div class="window-content">
+                    <textarea id="notesArea"></textarea>
+                    <br>
+                    <button class="file-btn" id="saveNotesBtn">Save Mémo</button>
+                  </div>
+                  <div class="window-footer">Drag me!</div>
+                </div>
+                <div class="window" id="fileViewerWindow">
+                  <div class="window-header">Quick Memo Viewer</div>
+                  <div class="window-content">
+                    <p>View your saved notes and quick ideas here.</p>
+                    <button class="file-btn" id="openMemoBtn">Open Mémo</button>
+                    <div id="virtualFileContent" class="memo-output"></div>
+                  </div>
+                  <div class="window-footer">Drag me!</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </aside>
+    </section>
+  </main>
 
   <div id="masterModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="masterTitle">
     <div class="modal-content">
@@ -54,13 +511,13 @@
         Welcome to your interactive magic space! Choose an option to unlock epic quests and tech upgrades:
       </p>
       <button class="file-btn" data-external-link="https://ko-fi.com/kevinmarville">
-        Support me on Ko‑fi
+        Support me on Ko-fi
       </button>
       <button class="file-btn" data-external-link="carCustomization.html" data-auth-required="true" data-i18n="launchCustomization">
         Launch 3D Car Customization
       </button>
       <br><br>
-      <button class="file-btn" data-close-modal="masterModal">Close</button>
+      <button class="file-btn ghost" data-close-modal="masterModal">Close</button>
     </div>
   </div>
 
@@ -70,7 +527,7 @@
       <p>
         Embark on epic quests: assemble your card deck, secure tech upgrades, tune your electric ride, and gather battle rewards. Every quest earns you rewards and upgrades!
       </p>
-      <button class="file-btn" data-close-modal="storyModal">Close Help</button>
+      <button class="file-btn ghost" data-close-modal="storyModal">Close Help</button>
     </div>
   </div>
 
@@ -81,7 +538,7 @@
       <p>Claim your prize now:</p>
       <a href="https://kvnbbg.fr" target="_blank" rel="noreferrer">Access Giveaway</a>
       <br>
-      <button class="file-btn" data-close-modal="easterModal">Close</button>
+      <button class="file-btn ghost" data-close-modal="easterModal">Close</button>
     </div>
   </div>
 
@@ -92,392 +549,6 @@
       Tokyo TCG Hub
     </text>
   </svg>
-
-  <div class="container content-grid">
-    <div class="score-card">
-      Score: <span id="scoreDisplay">0</span>
-    </div>
-    <div class="progress-container">
-      <div class="progress-bar" id="progressBar"></div>
-    </div>
-
-    <div class="card">
-      <h1 data-i18n="welcomeTitle">Welcome to the Bazaar</h1>
-      <p data-i18n-html="welcomeBody">
-        At <strong>Tokyo TCG Hub &amp; Star Bazaar</strong>, your journey begins! Customize your electric ride, master futuristic tech, and embark on quests that transform routine tasks into epic adventures.
-      </p>
-    </div>
-
-    <div class="card">
-      <h1 data-i18n="questsTitle">Epic Quests</h1>
-      <ul id="taskList">
-        <li>
-          <label>
-            <input type="checkbox" class="task-checkbox">
-            <strong>Quest: Assemble Your Card Deck</strong>
-          </label>
-          <ul class="subtask">
-            <li>
-              <label>
-                <input type="checkbox" class="task-checkbox">
-                Verify your deck is complete and every card is primed for battle.
-              </label>
-            </li>
-            <li>
-              <label>
-                <input type="checkbox" class="task-checkbox">
-                Activate all card powers for maximum impact.
-              </label>
-            </li>
-          </ul>
-        </li>
-        <li>
-          <label>
-            <input type="checkbox" class="task-checkbox">
-            <strong>Quest: Secure Your Tech Upgrades</strong>
-          </label>
-          <ul class="subtask">
-            <li>
-              <label>
-                <input type="checkbox" class="task-checkbox">
-                Confirm the latest firmware and system updates are installed.
-              </label>
-            </li>
-            <li>
-              <label>
-                <input type="checkbox" class="task-checkbox">
-                Check connectivity for tech boost features.
-              </label>
-            </li>
-          </ul>
-        </li>
-        <li>
-          <label>
-            <input type="checkbox" class="task-checkbox">
-            <strong>Quest: Tune Your Electric Ride</strong>
-          </label>
-          <ul class="subtask">
-            <li>
-              <label>
-                <input type="checkbox" class="task-checkbox">
-                Optimize performance settings for maximum efficiency.
-              </label>
-            </li>
-            <li>
-              <label>
-                <input type="checkbox" class="task-checkbox">
-                Calibrate your electric motor for peak performance.
-              </label>
-            </li>
-          </ul>
-        </li>
-        <li>
-          <label>
-            <input type="checkbox" class="task-checkbox">
-            <strong>Quest: Gather Battle Rewards</strong>
-          </label>
-          <ul class="subtask">
-            <li>
-              <label>
-                <input type="checkbox" class="task-checkbox">
-                Review your battle stats and achievements.
-              </label>
-            </li>
-            <li>
-              <label>
-                <input type="checkbox" class="task-checkbox">
-                Plan your next upgrade based on earned rewards.
-              </label>
-            </li>
-          </ul>
-        </li>
-      </ul>
-      <button id="resetBtn" class="file-btn block">Reset Quests</button>
-    </div>
-
-    <div class="card">
-      <h2 data-i18n="innovationTitle">Innovative Solutions ❤️</h2>
-      <p data-i18n="innovationBody">
-        Experience advanced tech with our futuristic customization tools, interactive challenges, and gamified upgrades that push your electric ride to the next level.
-      </p>
-    </div>
-
-    <div class="card auth-card" id="authCard">
-      <div class="auth-header">
-        <h2 data-i18n="authTitle">Join the Family</h2>
-        <span class="status-pill" id="authBadge" data-i18n="authBadgeGuest">Guest</span>
-      </div>
-      <p id="authStatus" data-i18n="authPrompt">
-        Create your secure profile to unlock the control panel and 3D lab.
-      </p>
-      <div class="auth-grid">
-        <form id="registerForm">
-          <h3 data-i18n="registerTitle">Create Account</h3>
-          <label for="registerName" data-i18n="labelName">Name</label>
-          <input id="registerName" type="text" required data-i18n-placeholder="placeholderName" placeholder="Your name">
-          <label for="registerEmail" data-i18n="labelEmail">Email</label>
-          <input id="registerEmail" type="email" required data-i18n-placeholder="placeholderEmail" placeholder="name@example.com">
-          <label for="registerPassword" data-i18n="labelPassword">Password</label>
-          <input id="registerPassword" type="password" required data-i18n-placeholder="placeholderPassword" placeholder="8+ characters">
-          <button class="file-btn" type="submit" data-i18n="registerButton">Register</button>
-        </form>
-        <form id="loginForm">
-          <h3 data-i18n="loginTitle">Sign In</h3>
-          <label for="loginEmail" data-i18n="labelEmail">Email</label>
-          <input id="loginEmail" type="email" required data-i18n-placeholder="placeholderEmail" placeholder="name@example.com">
-          <label for="loginPassword" data-i18n="labelPassword">Password</label>
-          <input id="loginPassword" type="password" required data-i18n-placeholder="placeholderPassword" placeholder="Your password">
-          <button class="file-btn" type="submit" data-i18n="loginButton">Sign In</button>
-        </form>
-      </div>
-      <button class="file-btn ghost" id="logoutBtn" type="button" hidden data-i18n="logoutButton">Sign out</button>
-      <section class="auth-manage" id="authManageSection" hidden>
-        <h3 data-i18n="authManageTitle">Manage Profile</h3>
-        <form id="manageForm">
-          <label for="manageName" data-i18n="authManageLabel">Display name</label>
-          <input id="manageName" type="text" required data-i18n-placeholder="authManagePlaceholder" placeholder="Update your display name">
-          <div class="auth-manage-actions">
-            <button class="file-btn" type="submit" data-i18n="authUpdateButton">Update Profile</button>
-            <button class="file-btn ghost danger" id="deleteAccountBtn" type="button" data-i18n="authDeleteButton">Delete Account</button>
-          </div>
-        </form>
-      </section>
-      <p class="auth-footnote" data-i18n="authFootnote">
-        Local SQL-style vault for now; serverless database coming soon.
-      </p>
-    </div>
-
-    <div class="card" id="evDataCard">
-      <h2 data-i18n="evDataTitle">Electric Car Intelligence</h2>
-      <p data-i18n="evDataSubtitle">
-        Curated specs from leading EV makers, tuned for quick comparison.
-      </p>
-      <div id="evDataGrid" class="data-grid" aria-live="polite"></div>
-    </div>
-
-    <div class="card" id="rallyCard">
-      <h2 data-i18n="rallyTitle">Rally Signal (2024/2025)</h2>
-      <p data-i18n="rallySubtitle">
-        Latest rally highlights and series you can follow right now.
-      </p>
-      <div id="rallyList" class="rally-grid" aria-live="polite"></div>
-    </div>
-
-    <div class="card" id="brakeLabCard">
-      <h2 data-i18n="brakeLabTitle">Whiteout Braking Display</h2>
-      <p data-i18n="brakeLabSubtitle">
-        Simulate EV braking pressure, ABS assist, and watch the whiteout flash when braking hits peak load.
-      </p>
-      <div class="brake-grid">
-        <div class="brake-controls">
-          <label for="brakePressure" data-i18n="brakePressureLabel">
-            Brake pressure
-          </label>
-          <div class="brake-pressure-row">
-            <input type="range" id="brakePressure" min="0" max="100" value="45">
-            <span id="brakePressureValue" class="brake-pressure-value">45%</span>
-          </div>
-          <label class="brake-toggle">
-            <input type="checkbox" id="absToggle" checked>
-            <span data-i18n="brakeAbsToggle">ABS assist engaged</span>
-          </label>
-          <div class="brake-actions">
-            <button class="file-btn" id="simulateBrake" data-i18n="brakeSimulateBtn">Simulate Brake</button>
-            <button class="file-btn ghost" id="releaseBrake" data-i18n="brakeReleaseBtn">Release</button>
-          </div>
-        </div>
-        <div class="brake-display">
-          <div class="brake-gauge" id="brakeGauge">
-            <span class="brake-gauge-value" id="brakeGaugeValue">45%</span>
-            <span class="brake-gauge-label" data-i18n="brakeGaugeLabel">Brake Pressure</span>
-          </div>
-          <div class="brake-metrics">
-            <div>
-              <span data-i18n="brakeAbsLabel">ABS</span>:
-              <strong id="absStatus">ON</strong>
-            </div>
-            <div>
-              <span data-i18n="brakeTempLabel">Rotor temp</span>:
-              <strong id="brakeTemp">320°C</strong>
-            </div>
-            <div>
-              <span data-i18n="brakeFeedbackLabel">Feedback</span>:
-              <strong id="brakeFeedback">Stable</strong>
-            </div>
-          </div>
-          <div id="brakeSignal" class="brake-signal" role="status" aria-live="polite"></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="card" id="vercelCard">
-      <h2 data-i18n="vercelTitle">Vercel-ready Car Templates</h2>
-      <p data-i18n="vercelIntro">
-        Vanilla JS car templates deploy as static sites on Vercel—just HTML, CSS, and JS files with no build step.
-      </p>
-      <div class="template-grid">
-        <article class="template-card">
-          <h3 data-i18n="templateCanvasTitle">Canvas Car Racer</h3>
-          <p data-i18n="templateCanvasBody">
-            Pure Canvas driving sim with sprite swaps for city or campaign branding.
-          </p>
-        </article>
-        <article class="template-card">
-          <h3 data-i18n="templateThreeTitle">Three.js Car Viewer</h3>
-          <p data-i18n="templateThreeBody">
-            Lightweight GLTF loader with orbit controls for interactive 3D showcases.
-          </p>
-        </article>
-        <article class="template-card">
-          <h3 data-i18n="templateSvgTitle">SVG Car Animator</h3>
-          <p data-i18n="templateSvgBody">
-            Minimal SVG path animation for 2D top-down routes and fleet tracking.
-          </p>
-        </article>
-      </div>
-      <h3 data-i18n="vercelStepsTitle">Deploy to Vercel in Minutes</h3>
-      <ol class="steps-list">
-        <li data-i18n="vercelStepOne">
-          Create an <code>index.html</code> with scripts, add <code>style.css</code>, and keep assets in the repo root.
-        </li>
-        <li data-i18n="vercelStepTwo">
-          Optional: add <code>vercel.json</code> to rewrite all routes to <code>index.html</code>.
-        </li>
-        <li data-i18n="vercelStepThree">
-          Push to GitHub and import the repo in Vercel for instant static deploys.
-        </li>
-      </ol>
-      <h3 data-i18n="vercelTipsTitle">Quick Customization Tips</h3>
-      <ul class="tips-list">
-        <li data-i18n="vercelTipOne">
-          Swap in free GLTF cars (Sketchfab) and adjust materials for city lighting.
-        </li>
-        <li data-i18n="vercelTipTwo">
-          Overlay campaign stats and delivery milestones directly on the HUD.
-        </li>
-        <li data-i18n="vercelTipThree">
-          Test locally with <code>npx serve</code>, then push to redeploy.
-        </li>
-      </ul>
-    </div>
-
-    <div class="card" id="coinGameCard">
-      <h2>Coin Game Challenge</h2>
-      <div>
-        <label for="coinsInput">Enter your coins (comma-separated):</label><br>
-        <input type="text" id="coinsInput" class="coin-game-input" placeholder="ex: 2,11,10,1,3">
-      </div>
-      <div>
-        <label for="thresholdInput">Threshold k:</label><br>
-        <input type="number" id="thresholdInput" class="coin-game-input" placeholder="ex: 10">
-      </div>
-      <button class="file-btn" id="startCoinGame">Start Game</button>
-      <div id="coinStatus" class="coin-status" role="status" aria-live="polite"></div>
-      <div id="coinError" class="coin-error" role="alert"></div>
-      <div id="coinDisplay" class="coin-display"></div>
-      <div id="coinLog" class="coin-log"></div>
-      <div class="container">
-        <p>
-          Combine your coins using the formula <em>min(x, y) * 2 + max(x, y)</em> until all coins are at or above the threshold <strong>k</strong>.
-        </p>
-        <span class="popup-alert" id="popupAlert">
-          Alert: An unexpected glitch occurred overnight. Our technicians are enhancing your experience.
-        </span>
-      </div>
-    </div>
-
-    <div class="card">
-      <h2>Math Calculator</h2>
-      <p>Enter a mathematical expression:</p>
-      <input type="text" id="mathInput" class="math-input" placeholder="Example: 2+3*4">
-      <br>
-      <button id="calcBtn" class="file-btn">Calculate</button>
-      <p id="mathResult" class="math-result"></p>
-    </div>
-
-    <div class="command-card">
-      <h2>Keyboard Commands &amp; Theme</h2>
-      <p>
-        Use shortcuts to interact:<br>
-        • <strong>Alt+R</strong>: Reset quests<br>
-        • <strong>Alt+N</strong>: Validate next quest<br>
-        • <strong>Alt+T</strong>: Toggle theme<br>
-        Or type a command below (try <code>help</code>):
-      </p>
-      <input
-        type="text"
-        id="commandInput"
-        data-i18n-placeholder="commandPlaceholder"
-        placeholder="Type 'reset', 'next', 'toggle', or '--help'"
-      >
-      <div id="commandOutput" class="command-output" role="status" aria-live="polite"></div>
-    </div>
-
-    <div class="card">
-      <h2>File Management</h2>
-      <div class="center">
-        <button class="file-btn" data-file-action="Open">Open</button>
-        <button class="file-btn" data-file-action="Organize">Organize</button>
-        <button class="file-btn" data-file-action="Clean">Clean</button>
-        <button class="file-btn" data-file-action="Delete">Delete</button>
-        <button class="file-btn" data-file-action="Hide">Hide</button>
-        <button class="file-btn" data-file-action="Archive">Archive</button>
-      </div>
-      <div id="fileLog"></div>
-    </div>
-
-    <div class="card">
-      <h2>Miscellaneous Data</h2>
-      <div class="folder" role="button" aria-expanded="false" data-folder-toggle="folderDrawings">📁 Drawings</div>
-      <div id="folderDrawings" class="folder-content">
-        <p>
-          Welcome, brave artist! These drawings are epic quests sketched by the hand of destiny.
-        </p>
-      </div>
-      <div class="folder" role="button" aria-expanded="false" data-folder-toggle="folderMemos">📁 Memos</div>
-      <div id="folderMemos" class="folder-content">
-        <p>
-          Greetings, strategist! These memos hold secret tips and plans for your next upgrade.
-        </p>
-      </div>
-      <div class="folder" role="button" aria-expanded="false" data-folder-toggle="folderBooks">📁 Books</div>
-      <div id="folderBooks" class="folder-content">
-        <p>
-          Knight of knowledge, dive into these legendary books—each page is an adventure.
-        </p>
-      </div>
-      <div class="folder" role="button" aria-expanded="false" data-folder-toggle="folderMusic">📁 Music</div>
-      <div id="folderMusic" class="folder-content">
-        <p>
-          Get ready for mesmerizing tunes that turn every quest into an epic dance.
-        </p>
-      </div>
-    </div>
-
-    <div class="card">
-      <h2>Some time as Mémo</h2>
-      <div id="desktop">
-        <div class="window" id="notesWindow">
-          <div class="window-header">Mémo</div>
-          <div class="window-content">
-            <textarea id="notesArea"></textarea>
-            <br>
-            <button class="file-btn" id="saveNotesBtn">Save Mémo</button>
-          </div>
-          <div class="window-footer">Drag me!</div>
-        </div>
-        <div class="window" id="fileViewerWindow">
-          <div class="window-header">Quick Memo Viewer</div>
-          <div class="window-content">
-            <p>View your saved notes and quick ideas here.</p>
-            <button class="file-btn" id="openMemoBtn">Open Mémo</button>
-            <div id="virtualFileContent" class="memo-output"></div>
-          </div>
-          <div class="window-footer">Drag me!</div>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <div id="brakeWhiteout" class="whiteout-overlay" aria-hidden="true"></div>
 
