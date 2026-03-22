@@ -944,14 +944,6 @@ input[type='checkbox'] {
   font-size: 0.9rem;
 }
 
-.social-preview {
-  display: block;
-  margin: 20px auto;
-  max-width: 100%;
-  border-radius: var(--border-radius-lg);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: var(--shadow);
-}
 
 #notesWindow {
   top: 20px;

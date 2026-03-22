@@ -4,7 +4,6 @@ A retro-futuristic, single-page web experience that blends trading card quests, 
 
 ![Car Image](/assets/pictures/car.jpg)
 
-[Play the App!](https://kvnbbg.github.io/500Discount/index.html)
 
 ## Product Scope
 
