@@ -2,17 +2,82 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const scriptPath = fileURLToPath(import.meta.url);
+const rootDir = path.resolve(path.dirname(scriptPath), '..');
 const configPath = path.join(rootDir, 'config', 'app-config.json');
 const runtimeConfigPath = path.join(rootDir, 'assets', 'js', 'runtime-config.js');
 const envPath = path.join(rootDir, '.env');
+const LOG_LEVELS = new Set(['debug', 'info', 'warn', 'error']);
+const CONFIG_OVERRIDE_MAP = Object.freeze({
+  APP_AI_INTERVAL_MS: {
+    key: 'aiMessageIntervalMs',
+    transform: (value) => toFiniteNumber(value),
+  },
+  APP_COIN_GAME_STEP_DELAY_MS: {
+    key: 'coinGameStepDelayMs',
+    transform: (value) => toFiniteNumber(value),
+  },
+  APP_FIRST_RUN_HELP: {
+    key: 'firstRunShowHelp',
+    transform: (value) => toBoolean(value),
+  },
+  APP_LOG_LEVEL: {
+    key: 'logLevel',
+    transform: (value) => toLogLevel(value),
+  },
+});
 
 const readJson = (filePath) => {
   const raw = fs.readFileSync(filePath, 'utf-8');
   return JSON.parse(raw);
 };
 
-const parseEnvFile = (filePath) => {
+const stripWrappingQuotes = (value) => {
+  if (
+    value.length >= 2 &&
+    ((value.startsWith('"') && value.endsWith('"')) ||
+      (value.startsWith("'") && value.endsWith("'")))
+  ) {
+    return value.slice(1, -1);
+  }
+
+  return value;
+};
+
+const toFiniteNumber = (value) => {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : undefined;
+};
+
+const toBoolean = (value) => {
+  if (typeof value === 'boolean') {
+    return value;
+  }
+
+  if (typeof value === 'string') {
+    const normalized = value.trim().toLowerCase();
+    if (normalized === 'true') {
+      return true;
+    }
+
+    if (normalized === 'false') {
+      return false;
+    }
+  }
+
+  return undefined;
+};
+
+const toLogLevel = (value) => {
+  if (typeof value !== 'string') {
+    return undefined;
+  }
+
+  const normalized = value.trim().toLowerCase();
+  return LOG_LEVELS.has(normalized) ? normalized : undefined;
+};
+
+export const parseEnvFile = (filePath) => {
   if (!fs.existsSync(filePath)) {
     return {};
   }
@@ -32,46 +97,35 @@ const parseEnvFile = (filePath) => {
       return;
     }
 
-    entries[key] = rest.join('=').trim();
+    entries[key] = stripWrappingQuotes(rest.join('=').trim());
   });
 
   return entries;
 };
 
-const applyOverrides = (config, env) => {
+export const applyOverrides = (config, env) => {
   const updated = { ...config };
 
-  if (env.APP_AI_INTERVAL_MS) {
-    const value = Number(env.APP_AI_INTERVAL_MS);
-    if (Number.isFinite(value)) {
-      updated.aiMessageIntervalMs = value;
+  Object.entries(CONFIG_OVERRIDE_MAP).forEach(([envKey, override]) => {
+    if (env[envKey] === undefined) {
+      return;
     }
-  }
 
-  if (env.APP_COIN_GAME_STEP_DELAY_MS) {
-    const value = Number(env.APP_COIN_GAME_STEP_DELAY_MS);
-    if (Number.isFinite(value)) {
-      updated.coinGameStepDelayMs = value;
+    const nextValue = override.transform(env[envKey]);
+    if (nextValue !== undefined) {
+      updated[override.key] = nextValue;
     }
-  }
-
-  if (env.APP_FIRST_RUN_HELP) {
-    updated.firstRunShowHelp = env.APP_FIRST_RUN_HELP.toLowerCase() === 'true';
-  }
-
-  if (env.APP_LOG_LEVEL) {
-    updated.logLevel = env.APP_LOG_LEVEL;
-  }
+  });
 
   return updated;
 };
 
-const writeRuntimeConfig = (config) => {
+export const writeRuntimeConfig = (config) => {
   const output = `window.__APP_CONFIG__ = ${JSON.stringify(config, null, 2)};\n`;
   fs.writeFileSync(runtimeConfigPath, output);
 };
 
-const main = () => {
+export const main = () => {
   try {
     const baseConfig = readJson(configPath);
     const envConfig = {
@@ -89,4 +143,6 @@ const main = () => {
   }
 };
 
-main();
+if (process.argv[1] && path.resolve(process.argv[1]) === scriptPath) {
+  main();
+}
