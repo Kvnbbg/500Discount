@@ -57,7 +57,7 @@ Project context and agentic workflow notes live in `CLAUDE.md` to keep architect
 1. Import the repository in Vercel.
 2. Set **Framework Preset** to **Other**.
 3. Keep **Root Directory** as the repo root.
-4. Deploy. The included `vercel.json` rewrites every route to `index.html` for a smooth SPA experience on direct visits and refreshes.
+4. Deploy. The included `vercel.json` serves real files first, then falls back unmatched routes to `index.html` so direct visits and refreshes work without breaking asset requests.
 
 ## Configuration
 
