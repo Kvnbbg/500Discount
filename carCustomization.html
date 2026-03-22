@@ -50,6 +50,23 @@
       height: 100vh;
       background-color: #eaeaea;
     }
+
+    #status-banner {
+      position: absolute;
+      right: 20px;
+      bottom: 20px;
+      max-width: 360px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      background: rgba(12, 18, 28, 0.88);
+      color: #f5f7fa;
+      z-index: 20;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
+    }
+
+    #status-banner[hidden] {
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -77,59 +94,96 @@
   </section>
 
   <section id="game-area" aria-hidden="true"></section>
+  <div id="status-banner" role="status" aria-live="polite" hidden></div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script>
-    // Setup scene, camera, and renderer
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x2f3438);
-    const camera = new THREE.PerspectiveCamera(
-      75,
-      window.innerWidth / window.innerHeight,
-      0.1,
-      1000
-    );
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.shadowMap.enabled = true;
-    renderer.outputEncoding = THREE.sRGBEncoding;
-    document.body.appendChild(renderer.domElement);
+    const gameArea = document.getElementById('game-area');
+    const statusBanner = document.getElementById('status-banner');
+    const showStatus = (message) => {
+      statusBanner.textContent = message;
+      statusBanner.hidden = false;
+    };
 
-    // Add lighting
-    const light = new THREE.DirectionalLight(0xffffff, 1);
-    light.position.set(5, 10, 7.5);
-    light.castShadow = true;
-    scene.add(light);
+    const loadThree = () =>
+      new Promise((resolve, reject) => {
+        if (window.THREE) {
+          resolve(window.THREE);
+          return;
+        }
 
-    const ambientLight = new THREE.AmbientLight(0x404040); // Soft lighting for shadows
-    scene.add(ambientLight);
+        const script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
+        script.onload = () => resolve(window.THREE);
+        script.onerror = () => {
+          reject(new Error('Three.js could not be loaded. Check the CDN connection and try again.'));
+        };
+        document.head.appendChild(script);
+      });
 
-    const carGroup = new THREE.Group();
-    scene.add(carGroup);
+    const bootGarage = async () => {
+      if (!window.WebGLRenderingContext) {
+        showStatus('This browser does not support WebGL, so the 3D garage cannot start.');
+        return;
+      }
+
+      let THREE;
+      try {
+        THREE = await loadThree();
+      } catch (error) {
+        showStatus(error.message);
+        return;
+      }
+
+      // Setup scene, camera, and renderer
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x2f3438);
+      const camera = new THREE.PerspectiveCamera(
+        75,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        1000
+      );
+      const renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.shadowMap.enabled = true;
+      renderer.outputEncoding = THREE.sRGBEncoding;
+      gameArea.appendChild(renderer.domElement);
+
+      // Add lighting
+      const light = new THREE.DirectionalLight(0xffffff, 1);
+      light.position.set(5, 10, 7.5);
+      light.castShadow = true;
+      scene.add(light);
+
+      const ambientLight = new THREE.AmbientLight(0x404040); // Soft lighting for shadows
+      scene.add(ambientLight);
+
+      const carGroup = new THREE.Group();
+      scene.add(carGroup);
 
     // Car Geometry: Using Standard material for more realistic lighting effects
-    const paints = [0x0077ff, 0xff3366, 0x14c38e, 0xffc300];
-    let paintIndex = 0;
-    const carMaterial = new THREE.MeshStandardMaterial({
-      color: paints[paintIndex],
-      metalness: 0.5,
-      roughness: 0.35,
-    });
-    const carGeometry = new THREE.BoxGeometry(2, 0.5, 1);
-    const car = new THREE.Mesh(carGeometry, carMaterial);
-    car.castShadow = true;
-    carGroup.add(car);
+      const paints = [0x0077ff, 0xff3366, 0x14c38e, 0xffc300];
+      let paintIndex = 0;
+      const carMaterial = new THREE.MeshStandardMaterial({
+        color: paints[paintIndex],
+        metalness: 0.5,
+        roughness: 0.35,
+      });
+      const carGeometry = new THREE.BoxGeometry(2, 0.5, 1);
+      const car = new THREE.Mesh(carGeometry, carMaterial);
+      car.castShadow = true;
+      carGroup.add(car);
 
-    const cabinGeometry = new THREE.BoxGeometry(1.1, 0.45, 0.9);
-    const cabinMaterial = new THREE.MeshStandardMaterial({
-      color: 0x222831,
-      metalness: 0.2,
-      roughness: 0.5,
-    });
-    const cabin = new THREE.Mesh(cabinGeometry, cabinMaterial);
-    cabin.position.set(-0.1, 0.45, 0);
-    cabin.castShadow = true;
-    carGroup.add(cabin);
+      const cabinGeometry = new THREE.BoxGeometry(1.1, 0.45, 0.9);
+      const cabinMaterial = new THREE.MeshStandardMaterial({
+        color: 0x222831,
+        metalness: 0.2,
+        roughness: 0.5,
+      });
+      const cabin = new THREE.Mesh(cabinGeometry, cabinMaterial);
+      cabin.position.set(-0.1, 0.45, 0);
+      cabin.castShadow = true;
+      carGroup.add(cabin);
 
     const spoilerGeometry = new THREE.BoxGeometry(0.7, 0.1, 0.35);
     const spoiler = new THREE.Mesh(spoilerGeometry, carMaterial);
@@ -264,149 +318,155 @@
       garage.add(stripe);
     }
 
-    const overheadLight = new THREE.PointLight(0xffffff, 0.9, 30);
-    overheadLight.position.set(0, garageHeight - 0.8, 2);
-    overheadLight.castShadow = true;
-    scene.add(overheadLight);
+      const overheadLight = new THREE.PointLight(0xffffff, 0.9, 30);
+      overheadLight.position.set(0, garageHeight - 0.8, 2);
+      overheadLight.castShadow = true;
+      scene.add(overheadLight);
 
-    // Camera position and settings
-    camera.position.set(0, 2.2, 7);
-    camera.lookAt(0, 0.2, 0);
+      // Camera position and settings
+      camera.position.set(0, 2.2, 7);
+      camera.lookAt(0, 0.2, 0);
 
-    let carSpeed = 0;
-    let carRotation = 0;
-    const maxSpeed = 0.1;
-    const acceleration = 0.002;
-    const deceleration = 0.001;
-    let autoLoop = false;
-    let isDragging = false;
-    let lastX = 0;
-    let lightsOn = true;
-    let spoilerOn = true;
+      let carSpeed = 0;
+      let carRotation = 0;
+      const maxSpeed = 0.1;
+      const acceleration = 0.002;
+      const deceleration = 0.001;
+      let autoLoop = false;
+      let isDragging = false;
+      let lastX = 0;
+      let lightsOn = true;
+      let spoilerOn = true;
 
-    // Button controls for speed and direction
-    document.getElementById('left-btn').addEventListener('click', () => {
-      carRotation -= 0.05;
-    });
+      // Button controls for speed and direction
+      document.getElementById('left-btn').addEventListener('click', () => {
+        carRotation -= 0.05;
+      });
 
-    document.getElementById('right-btn').addEventListener('click', () => {
-      carRotation += 0.05;
-    });
+      document.getElementById('right-btn').addEventListener('click', () => {
+        carRotation += 0.05;
+      });
 
-    document.getElementById('up-btn').addEventListener('click', () => {
-      if (carSpeed < maxSpeed) {
-        carSpeed += acceleration;
+      document.getElementById('up-btn').addEventListener('click', () => {
+        if (carSpeed < maxSpeed) {
+          carSpeed += acceleration;
+        }
+      });
+
+      document.getElementById('stop-btn').addEventListener('click', () => {
+        carSpeed = 0;
+      });
+
+      document.getElementById('paint-btn').addEventListener('click', () => {
+        paintIndex = (paintIndex + 1) % paints.length;
+        carMaterial.color.setHex(paints[paintIndex]);
+      });
+
+      document.getElementById('lights-btn').addEventListener('click', () => {
+        lightsOn = !lightsOn;
+        lightMaterial.emissiveIntensity = lightsOn ? 0.7 : 0.0;
+      });
+
+      document.getElementById('spoiler-btn').addEventListener('click', () => {
+        spoilerOn = !spoilerOn;
+        spoiler.visible = spoilerOn;
+      });
+
+      document.getElementById('loop-btn').addEventListener('click', () => {
+        autoLoop = !autoLoop;
+      });
+
+      document.getElementById('reset-btn').addEventListener('click', () => {
+        carGroup.position.set(0, 0, 0);
+        carGroup.rotation.set(0, 0, 0);
+        carRotation = 0;
+        carSpeed = 0;
+      });
+
+      renderer.domElement.addEventListener('mousedown', (event) => {
+        isDragging = true;
+        lastX = event.clientX;
+      });
+
+      window.addEventListener('mouseup', () => {
+        isDragging = false;
+      });
+
+      window.addEventListener('mousemove', (event) => {
+        if (!isDragging) {
+          return;
+        }
+        const deltaX = event.clientX - lastX;
+        lastX = event.clientX;
+        carRotation += deltaX * 0.005;
+      });
+
+      const garageBounds = {
+        minX: -garageWidth / 2 + 1.5,
+        maxX: garageWidth / 2 - 1.5,
+        minZ: -garageDepth / 2 + 2,
+        maxZ: garageDepth / 2 - 2,
+      };
+
+      // Update loop with smooth movement and realistic car behavior
+      function animate() {
+        requestAnimationFrame(animate);
+
+        const spinFactor = carSpeed * 25;
+        wheel1.rotation.x -= spinFactor;
+        wheel2.rotation.x -= spinFactor;
+        wheel3.rotation.x -= spinFactor;
+        wheel4.rotation.x -= spinFactor;
+
+        if (autoLoop) {
+          const time = performance.now() * 0.0005;
+          carGroup.position.x = Math.cos(time) * 3;
+          carGroup.position.z = Math.sin(time) * 5;
+          carGroup.rotation.y = -time + Math.PI / 2;
+        } else {
+          // Smooth car rotation
+          carGroup.rotation.y = THREE.MathUtils.lerp(carGroup.rotation.y, carRotation, 0.12);
+
+          const forward = new THREE.Vector3(0, 0, -1).applyAxisAngle(
+            new THREE.Vector3(0, 1, 0),
+            carGroup.rotation.y
+          );
+          carGroup.position.addScaledVector(forward, carSpeed);
+
+          if (carSpeed > 0) {
+            carSpeed = Math.max(0, carSpeed - deceleration);
+          }
+        }
+
+        // Clamp the car to the garage bounds
+        carGroup.position.x = THREE.MathUtils.clamp(
+          carGroup.position.x,
+          garageBounds.minX,
+          garageBounds.maxX
+        );
+        carGroup.position.z = THREE.MathUtils.clamp(
+          carGroup.position.z,
+          garageBounds.minZ,
+          garageBounds.maxZ
+        );
+
+        // Render the scene
+        renderer.render(scene, camera);
       }
-    });
 
-    document.getElementById('stop-btn').addEventListener('click', () => {
-      carSpeed = 0;
-    });
+      animate();
 
-    document.getElementById('paint-btn').addEventListener('click', () => {
-      paintIndex = (paintIndex + 1) % paints.length;
-      carMaterial.color.setHex(paints[paintIndex]);
-    });
-
-    document.getElementById('lights-btn').addEventListener('click', () => {
-      lightsOn = !lightsOn;
-      lightMaterial.emissiveIntensity = lightsOn ? 0.7 : 0.0;
-    });
-
-    document.getElementById('spoiler-btn').addEventListener('click', () => {
-      spoilerOn = !spoilerOn;
-      spoiler.visible = spoilerOn;
-    });
-
-    document.getElementById('loop-btn').addEventListener('click', () => {
-      autoLoop = !autoLoop;
-    });
-
-    document.getElementById('reset-btn').addEventListener('click', () => {
-      carGroup.position.set(0, 0, 0);
-      carGroup.rotation.set(0, 0, 0);
-      carRotation = 0;
-      carSpeed = 0;
-    });
-
-    renderer.domElement.addEventListener('mousedown', (event) => {
-      isDragging = true;
-      lastX = event.clientX;
-    });
-
-    window.addEventListener('mouseup', () => {
-      isDragging = false;
-    });
-
-    window.addEventListener('mousemove', (event) => {
-      if (!isDragging) {
-        return;
-      }
-      const deltaX = event.clientX - lastX;
-      lastX = event.clientX;
-      carRotation += deltaX * 0.005;
-    });
-
-    const garageBounds = {
-      minX: -garageWidth / 2 + 1.5,
-      maxX: garageWidth / 2 - 1.5,
-      minZ: -garageDepth / 2 + 2,
-      maxZ: garageDepth / 2 - 2,
+      // Handle window resizing
+      window.addEventListener('resize', () => {
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+      });
     };
 
-    // Update loop with smooth movement and realistic car behavior
-    function animate() {
-      requestAnimationFrame(animate);
-
-      const spinFactor = carSpeed * 25;
-      wheel1.rotation.x -= spinFactor;
-      wheel2.rotation.x -= spinFactor;
-      wheel3.rotation.x -= spinFactor;
-      wheel4.rotation.x -= spinFactor;
-
-      if (autoLoop) {
-        const time = performance.now() * 0.0005;
-        carGroup.position.x = Math.cos(time) * 3;
-        carGroup.position.z = Math.sin(time) * 5;
-        carGroup.rotation.y = -time + Math.PI / 2;
-      } else {
-        // Smooth car rotation
-        carGroup.rotation.y = THREE.MathUtils.lerp(carGroup.rotation.y, carRotation, 0.12);
-
-        const forward = new THREE.Vector3(0, 0, -1).applyAxisAngle(
-          new THREE.Vector3(0, 1, 0),
-          carGroup.rotation.y
-        );
-        carGroup.position.addScaledVector(forward, carSpeed);
-
-        if (carSpeed > 0) {
-          carSpeed = Math.max(0, carSpeed - deceleration);
-        }
-      }
-
-      // Clamp the car to the garage bounds
-      carGroup.position.x = THREE.MathUtils.clamp(
-        carGroup.position.x,
-        garageBounds.minX,
-        garageBounds.maxX
-      );
-      carGroup.position.z = THREE.MathUtils.clamp(
-        carGroup.position.z,
-        garageBounds.minZ,
-        garageBounds.maxZ
-      );
-
-      // Render the scene
-      renderer.render(scene, camera);
-    }
-
-    animate();
-
-    // Handle window resizing
-    window.addEventListener('resize', () => {
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
+    bootGarage().catch((error) => {
+      const message = error instanceof Error ? error.message : 'Unknown 3D garage error.';
+      showStatus(message);
     });
   </script>
 </body>
