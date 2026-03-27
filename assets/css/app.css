@@ -965,8 +965,20 @@ input[type='checkbox'] {
 }
 
 .folder {
+  display: block;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
   cursor: pointer;
   padding: 8px 0;
+}
+
+.folder:focus-visible {
+  outline: 2px solid var(--highlight-color);
+  outline-offset: 2px;
 }
 
 .folder-content {
