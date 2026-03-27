@@ -102,6 +102,10 @@ const createParser = (expression) => {
       consume();
       const rhs = parseUnary();
 
+      if ((char === '/' || char === '%') && rhs === 0) {
+        throw new Error('Cannot divide by zero.');
+      }
+
       if (char === '*') {
         value *= rhs;
       } else if (char === '/') {
@@ -175,7 +179,11 @@ export const safeEvaluateExpression = (expression) => {
     }
 
     return { ok: true, value: result };
-  } catch {
+  } catch (error) {
+    if (error instanceof Error && error.message === 'Cannot divide by zero.') {
+      return { ok: false, error: 'Division or modulo by zero is not allowed.' };
+    }
+
     return { ok: false, error: 'Invalid expression. Check your syntax.' };
   }
 };

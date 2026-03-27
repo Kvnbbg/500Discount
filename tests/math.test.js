@@ -36,8 +36,15 @@ describe('safeEvaluateExpression', () => {
     expect(result.error).toContain('too long');
   });
 
-  it('rejects non-finite results', () => {
+  it('rejects division by zero with explicit guidance', () => {
     const result = safeEvaluateExpression('1 / 0');
     expect(result.ok).toBe(false);
+    expect(result.error).toBe('Division or modulo by zero is not allowed.');
+  });
+
+  it('rejects modulo by zero with explicit guidance', () => {
+    const result = safeEvaluateExpression('5 % 0');
+    expect(result.ok).toBe(false);
+    expect(result.error).toBe('Division or modulo by zero is not allowed.');
   });
 });
