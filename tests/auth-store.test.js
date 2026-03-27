@@ -109,4 +109,12 @@ describe('storage JSON helpers', () => {
     writeStorageJSON('payload', { level: 5 });
     expect(readStorageJSON('payload', null)).toEqual({ level: 5 });
   });
+
+  it('fails gracefully when serializing circular JSON payloads', () => {
+    const payload = {};
+    payload.self = payload;
+
+    expect(writeStorageJSON('payload', payload)).toBe(false);
+    expect(readStorageJSON('payload', 'fallback')).toBe('fallback');
+  });
 });

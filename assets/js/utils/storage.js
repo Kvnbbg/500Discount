@@ -48,4 +48,10 @@ export const readStorageJSON = (key, fallback) => {
   }
 };
 
-export const writeStorageJSON = (key, value) => writeStorageValue(key, JSON.stringify(value));
+export const writeStorageJSON = (key, value) => {
+  try {
+    return writeStorageValue(key, JSON.stringify(value));
+  } catch {
+    return false;
+  }
+};
