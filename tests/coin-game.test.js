@@ -1,10 +1,31 @@
-import { computeCoinOperations, parseCoinsInput, parseThreshold } from '../assets/js/utils/coin-game.js';
+import {
+  computeCoinOperations,
+  parseCoinsInput,
+  parseCoinsInputDetailed,
+  parseThreshold,
+} from '../assets/js/utils/coin-game.js';
 import { describe, expect, it } from 'vitest';
 
 describe('coin game utils', () => {
   it('parses valid coin input values', () => {
     const coins = parseCoinsInput('2, 11, -3, foo, 5');
     expect(coins).toEqual([2, 11, 5]);
+  });
+
+  it('returns detailed parsing feedback for mixed coin inputs', () => {
+    expect(parseCoinsInputDetailed('2, foo, -3, 5')).toEqual({
+      ok: true,
+      coins: [2, 5],
+      warning: 'Invalid entries: foo. Negative values are not allowed: -3',
+    });
+  });
+
+  it('fails detailed parsing when no valid coins are provided', () => {
+    expect(parseCoinsInputDetailed('foo, -3')).toEqual({
+      ok: false,
+      coins: [],
+      error: 'No valid coin values found. Use comma-separated numbers like 1, 2, 3.',
+    });
   });
 
   it('validates threshold values', () => {

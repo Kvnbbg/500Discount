@@ -3,7 +3,7 @@ import { handleError } from './errors.js';
 import { createLogger } from './logger.js';
 import {
   computeCoinOperations,
-  parseCoinsInput,
+  parseCoinsInputDetailed,
   parseThreshold,
 } from './utils/coin-game.js';
 import { safeEvaluateExpression } from './utils/math.js';
@@ -851,11 +851,11 @@ const initCoinGame = ({
 
     setStatusMessage(coinError, '');
 
-    const coins = parseCoinsInput(coinsInput.value);
+    const parsedCoins = parseCoinsInputDetailed(coinsInput.value);
     const thresholdResult = parseThreshold(thresholdInput.value);
 
-    if (coins.length === 0) {
-      setStatusMessage(coinError, 'Enter at least one valid coin value.');
+    if (!parsedCoins.ok) {
+      setStatusMessage(coinError, parsedCoins.error);
       return;
     }
 
@@ -864,8 +864,15 @@ const initCoinGame = ({
       return;
     }
 
+    const coins = parsedCoins.coins;
+
     setRunningState(true);
-    setStatusMessage(coinStatus, 'Calculating optimal merges...');
+    setStatusMessage(
+      coinStatus,
+      parsedCoins.warning
+        ? `Calculating optimal merges... (${parsedCoins.warning})`
+        : 'Calculating optimal merges...'
+    );
     if (coinLog) {
       coinLog.replaceChildren();
     }
