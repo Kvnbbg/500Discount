@@ -8,6 +8,12 @@ describe('safeEvaluateExpression', () => {
     expect(result.value).toBe(14);
   });
 
+  it('supports unary operators and parentheses', () => {
+    const result = safeEvaluateExpression('-(2 + 3) * 4');
+    expect(result.ok).toBe(true);
+    expect(result.value).toBe(-20);
+  });
+
   it('rejects unsafe expressions', () => {
     const result = safeEvaluateExpression('alert(1)');
     expect(result.ok).toBe(false);
@@ -16,6 +22,18 @@ describe('safeEvaluateExpression', () => {
   it('rejects empty input', () => {
     const result = safeEvaluateExpression('');
     expect(result.ok).toBe(false);
+  });
+
+  it('rejects malformed syntax', () => {
+    const result = safeEvaluateExpression('2 + * 3');
+    expect(result.ok).toBe(false);
+  });
+
+  it('rejects expressions above length limit', () => {
+    const expression = '1+'.repeat(251);
+    const result = safeEvaluateExpression(expression);
+    expect(result.ok).toBe(false);
+    expect(result.error).toContain('too long');
   });
 
   it('rejects non-finite results', () => {
