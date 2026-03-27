@@ -1160,6 +1160,15 @@ const initFolders = () => {
       content.style.display = isOpen ? 'none' : 'block';
       button.setAttribute('aria-expanded', String(!isOpen));
     });
+
+    button.addEventListener('keydown', (event) => {
+      if (event.key !== 'Enter' && event.key !== ' ') {
+        return;
+      }
+
+      event.preventDefault();
+      button.click();
+    });
   });
 };
 
