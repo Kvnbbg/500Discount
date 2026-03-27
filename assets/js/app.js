@@ -1160,6 +1160,7 @@ const initFolders = () => {
       content.style.display = isOpen ? 'none' : 'block';
       button.setAttribute('aria-expanded', String(!isOpen));
     });
+
   });
 };
 
