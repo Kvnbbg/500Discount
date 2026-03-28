@@ -10,10 +10,28 @@ const base64Encode = (value) => {
   bytes.forEach((byte) => {
     binary += String.fromCharCode(byte);
   });
-  return btoa(binary);
+
+  if (typeof globalThis.btoa === 'function') {
+    return globalThis.btoa(binary);
+  }
+
+  if (typeof globalThis.Buffer !== 'undefined') {
+    return globalThis.Buffer.from(binary, 'binary').toString('base64');
+  }
+
+  throw new Error('No base64 encoder available.');
 };
 
-export const normalizeEmail = (email) => email.trim().toLowerCase();
+export const normalizeEmail = (email) => {
+  if (typeof email !== 'string') {
+    return '';
+  }
+
+  return email.trim().toLowerCase();
+};
+
+const normalizeName = (name) => (typeof name === 'string' ? name.trim() : '');
+const isValidPassword = (password) => typeof password === 'string' && password.length > 0;
 
 export const hashPassword = async (password) => {
   const cryptoApi = globalThis.crypto;
@@ -55,7 +73,12 @@ export const createAuthStore = () => {
   const findUserByEmail = (email) => readUsers().find((user) => user.email === email);
 
   const registerUser = async ({ name, email, password }) => {
+    const normalizedName = normalizeName(name);
     const normalizedEmail = normalizeEmail(email);
+    if (normalizedName.length === 0 || normalizedEmail.length === 0 || !isValidPassword(password)) {
+      return { ok: false, reason: 'invalid-input' };
+    }
+
     const users = readUsers();
 
     if (users.some((user) => user.email === normalizedEmail)) {
@@ -64,7 +87,7 @@ export const createAuthStore = () => {
 
     const passwordHash = await hashPassword(password);
     const newUser = {
-      name,
+      name: normalizedName,
       email: normalizedEmail,
       passwordHash,
       createdAt: new Date().toISOString(),
@@ -81,6 +104,10 @@ export const createAuthStore = () => {
 
   const authenticateUser = async ({ email, password }) => {
     const normalizedEmail = normalizeEmail(email);
+    if (normalizedEmail.length === 0 || !isValidPassword(password)) {
+      return { ok: false, reason: 'invalid' };
+    }
+
     const user = findUserByEmail(normalizedEmail);
     if (!user) {
       return { ok: false, reason: 'invalid' };
@@ -97,7 +124,12 @@ export const createAuthStore = () => {
   };
 
   const updateProfile = ({ email, name }) => {
+    const normalizedName = normalizeName(name);
     const normalizedEmail = normalizeEmail(email);
+    if (normalizedEmail.length === 0 || normalizedName.length === 0) {
+      return { ok: false, reason: 'invalid-input' };
+    }
+
     const users = readUsers();
     const index = users.findIndex((user) => user.email === normalizedEmail);
     if (index === -1) {
@@ -106,7 +138,7 @@ export const createAuthStore = () => {
 
     const updatedUser = {
       ...users[index],
-      name,
+      name: normalizedName,
       updatedAt: new Date().toISOString(),
     };
     users[index] = updatedUser;
@@ -114,7 +146,7 @@ export const createAuthStore = () => {
 
     const session = getSession();
     if (session?.email === normalizedEmail) {
-      const updatedSession = { ...session, name };
+      const updatedSession = { ...session, name: normalizedName };
       setSession(updatedSession);
       return { ok: true, session: updatedSession };
     }
