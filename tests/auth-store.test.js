@@ -91,6 +91,51 @@ describe('auth store CRUD flows', () => {
     expect(deletion.ok).toBe(true);
     expect(store.getSession()).toBeNull();
   });
+
+  it('rejects invalid profile inputs without throwing', async () => {
+    const store = createAuthStore();
+
+    await expect(
+      store.registerUser({
+        name: '   ',
+        email: 'invalid@example.com',
+        password: 'supersecure',
+      }),
+    ).resolves.toEqual({
+      ok: false,
+      reason: 'invalid-input',
+    });
+
+    await expect(
+      store.registerUser({
+        name: 'Nova',
+        email: null,
+        password: 'supersecure',
+      }),
+    ).resolves.toEqual({
+      ok: false,
+      reason: 'invalid-input',
+    });
+
+    await expect(
+      store.authenticateUser({
+        email: undefined,
+        password: 'supersecure',
+      }),
+    ).resolves.toEqual({
+      ok: false,
+      reason: 'invalid',
+    });
+
+    const updateResult = store.updateProfile({
+      email: 'nova@example.com',
+      name: '  ',
+    });
+    expect(updateResult).toEqual({
+      ok: false,
+      reason: 'invalid-input',
+    });
+  });
 });
 
 describe('storage JSON helpers', () => {
