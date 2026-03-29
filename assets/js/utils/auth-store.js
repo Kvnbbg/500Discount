@@ -31,7 +31,9 @@ export const normalizeEmail = (email) => {
 };
 
 const normalizeName = (name) => (typeof name === 'string' ? name.trim() : '');
-const isValidPassword = (password) => typeof password === 'string' && password.length > 0;
+const AUTH_MINIMUM_PASSWORD_LENGTH = 8;
+const isValidPassword = (password) =>
+  typeof password === 'string' && password.length >= AUTH_MINIMUM_PASSWORD_LENGTH;
 
 export const hashPassword = async (password) => {
   const cryptoApi = globalThis.crypto;
