@@ -614,8 +614,9 @@ const initAuth = async ({
     }
 
     const response = await authStore.registerUser({ name, email, password });
-    if (!response.ok && response.reason === 'exists') {
-      applyAuthState(null, 'authRegisterExists');
+    if (!response.ok) {
+      const messageKey = response.reason === 'exists' ? 'authRegisterExists' : 'authRegisterInvalid';
+      applyAuthState(null, messageKey);
       return;
     }
 

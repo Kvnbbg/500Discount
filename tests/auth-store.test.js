@@ -117,6 +117,18 @@ describe('auth store CRUD flows', () => {
       reason: 'invalid-input',
     });
 
+
+    await expect(
+      store.registerUser({
+        name: 'Nova',
+        email: 'short@example.com',
+        password: 'short',
+      }),
+    ).resolves.toEqual({
+      ok: false,
+      reason: 'invalid-input',
+    });
+
     await expect(
       store.authenticateUser({
         email: undefined,
