@@ -126,6 +126,30 @@ const translations = {
     vercelTipTwo: 'Overlay campaign stats and delivery milestones directly on the HUD.',
     vercelTipThree: 'Test locally with npx serve, then push to redeploy.',
     commandPlaceholder: "Type 'reset', 'next', 'toggle', or '--help'",
+    commandReady: 'Ready. Type "help" for commands.',
+    commandPrompt: 'Enter a command. Type "help" for options.',
+    commandHelpText:
+      'Available commands:\n• help / --help / ? — show this message\n• reset — reset all quests\n• next — complete the next quest\n• toggle — toggle the theme\n• magicword — trigger a bonus event',
+    commandResetDone: 'Quests reset. Ready for a new run.',
+    commandNextDone: 'Next quest validated.',
+    commandToggleDone: 'Theme toggled.',
+    commandMagicDone: 'Mystery mode activated!',
+    commandUnknown: 'Unknown command: {command}. Type "help" for options.',
+    coinGameRunningLabel: 'Running...',
+    coinGameStartLabel: 'Start Game',
+    coinGameReadyStatus: 'Ready to combine coins. Enter values to start.',
+    coinGameCalculating: 'Calculating optimal merges...',
+    coinGameCalculatingWarning: 'Calculating optimal merges... ({warning})',
+    coinGameAllMeetThreshold: 'All coins already meet the threshold.',
+    coinGameNotEnough: 'Not enough coins to reach the threshold.',
+    coinGameReached: 'Threshold reached!',
+    coinGameUnreachable: 'Unable to reach threshold with the provided coins.',
+    coinGameMinOps: 'Minimum operations required: {operations}',
+    coinGameOperation: 'Operation {index}: Combined {left} and {right} to create {result}',
+    memoSaved: 'Memo saved! You can open it in the Quick Memo Viewer.',
+    memoSaveError: 'Unable to save the memo. Check browser storage permissions.',
+    memoEmpty: 'No memo saved yet.',
+    memoTitle: 'Your saved memo:',
     brakeLabTitle: 'Whiteout Braking Display',
     brakeLabSubtitle:
       'Simulate EV braking pressure, ABS assist, and watch the whiteout flash when braking hits peak load.',
@@ -236,6 +260,32 @@ const translations = {
       'Ajoutez des stats de campagne et des jalons de livraison directement sur le HUD.',
     vercelTipThree: 'Testez avec npx serve, puis poussez pour redéployer.',
     commandPlaceholder: "Tapez 'reset', 'next', 'toggle' ou '--help'",
+    commandReady: 'Prêt. Tapez "help" pour les commandes.',
+    commandPrompt: 'Entrez une commande. Tapez "help" pour les options.',
+    commandHelpText:
+      'Commandes disponibles :\n• help / --help / ? — afficher ce message\n• reset — réinitialiser les quêtes\n• next — valider la prochaine quête\n• toggle — changer le thème\n• magicword — déclencher un bonus',
+    commandResetDone: 'Quêtes réinitialisées. Prêt pour un nouveau run.',
+    commandNextDone: 'Prochaine quête validée.',
+    commandToggleDone: 'Thème basculé.',
+    commandMagicDone: 'Mode mystère activé !',
+    commandUnknown: 'Commande inconnue : {command}. Tapez "help" pour les options.',
+    coinGameRunningLabel: 'En cours...',
+    coinGameStartLabel: 'Lancer le jeu',
+    coinGameReadyStatus: 'Prêt à combiner les pièces. Entrez des valeurs.',
+    coinGameCalculating: 'Calcul des combinaisons optimales...',
+    coinGameCalculatingWarning: 'Calcul des combinaisons optimales... ({warning})',
+    coinGameAllMeetThreshold: 'Toutes les pièces atteignent déjà le seuil.',
+    coinGameNotEnough: "Pas assez de pièces pour atteindre le seuil.",
+    coinGameReached: 'Seuil atteint !',
+    coinGameUnreachable: "Impossible d'atteindre le seuil avec ces pièces.",
+    coinGameMinOps: 'Nombre minimum d’opérations : {operations}',
+    coinGameOperation:
+      'Opération {index} : combinaison de {left} et {right} pour créer {result}',
+    memoSaved: 'Mémo sauvegardé ! Ouvrez-le dans le visualiseur rapide.',
+    memoSaveError:
+      'Impossible de sauvegarder le mémo. Vérifiez les permissions de stockage.',
+    memoEmpty: 'Aucun mémo sauvegardé pour le moment.',
+    memoTitle: 'Votre mémo sauvegardé :',
     brakeLabTitle: 'Affichage de freinage Whiteout',
     brakeLabSubtitle:
       "Simule la pression de freinage, l'assistance ABS, et observe le flash whiteout quand le freinage atteint le pic.",
@@ -280,6 +330,14 @@ const getAiMessages = (lang) => {
 
 const getTranslation = (lang, key) =>
   (translations[lang] && translations[lang][key]) || translations.en[key] || key;
+
+const formatTranslation = (lang, key, replacements = {}) => {
+  let value = getTranslation(lang, key);
+  Object.entries(replacements).forEach(([token, replacement]) => {
+    value = value.replaceAll(`{${token}}`, String(replacement));
+  });
+  return value;
+};
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -832,7 +890,7 @@ const initCoinGame = ({
   coinError,
 }) => {
   if (!startCoinGameBtn || !coinsInput || !thresholdInput) {
-    return;
+    return { applyLanguage: () => {} };
   }
 
   let isRunning = false;
@@ -841,8 +899,8 @@ const initCoinGame = ({
     isRunning = running;
     startCoinGameBtn.disabled = running;
     startCoinGameBtn.textContent = running
-      ? UI_CONSTANTS.coinGameRunningLabel
-      : UI_CONSTANTS.coinGameStartLabel;
+      ? getTranslation(currentLanguage, 'coinGameRunningLabel')
+      : getTranslation(currentLanguage, 'coinGameStartLabel');
   };
 
   const runCoinGame = async () => {
@@ -871,8 +929,10 @@ const initCoinGame = ({
     setStatusMessage(
       coinStatus,
       parsedCoins.warning
-        ? `Calculating optimal merges... (${parsedCoins.warning})`
-        : 'Calculating optimal merges...'
+        ? formatTranslation(currentLanguage, 'coinGameCalculatingWarning', {
+            warning: parsedCoins.warning,
+          })
+        : getTranslation(currentLanguage, 'coinGameCalculating')
     );
     if (coinLog) {
       coinLog.replaceChildren();
@@ -887,12 +947,18 @@ const initCoinGame = ({
         setStatusMessage(
           coinStatus,
           result.success
-            ? 'All coins already meet the threshold.'
-            : 'Not enough coins to reach the threshold.'
+            ? getTranslation(currentLanguage, 'coinGameAllMeetThreshold')
+            : getTranslation(currentLanguage, 'coinGameNotEnough')
         );
-        appendCoinLogEntry(coinLog, `Minimum operations required: ${result.operations}`, {
+        appendCoinLogEntry(
+          coinLog,
+          formatTranslation(currentLanguage, 'coinGameMinOps', {
+            operations: result.operations,
+          }),
+          {
           strong: true,
-        });
+          }
+        );
         return;
       }
 
@@ -906,7 +972,12 @@ const initCoinGame = ({
         workingCoins.push(step.newCoin);
         appendCoinLogEntry(
           coinLog,
-          `Operation ${index + 1}: Combined ${x} and ${y} to create ${step.newCoin}`
+          formatTranslation(currentLanguage, 'coinGameOperation', {
+            index: index + 1,
+            left: x,
+            right: y,
+            result: step.newCoin,
+          })
         );
         await sleep(config.coinGameStepDelayMs);
         renderCoins(coinDisplay, workingCoins);
@@ -915,12 +986,18 @@ const initCoinGame = ({
       setStatusMessage(
         coinStatus,
         result.success
-          ? 'Threshold reached!'
-          : 'Unable to reach threshold with the provided coins.'
+          ? getTranslation(currentLanguage, 'coinGameReached')
+          : getTranslation(currentLanguage, 'coinGameUnreachable')
       );
-      appendCoinLogEntry(coinLog, `Minimum operations required: ${result.operations}`, {
+      appendCoinLogEntry(
+        coinLog,
+        formatTranslation(currentLanguage, 'coinGameMinOps', {
+          operations: result.operations,
+        }),
+        {
         strong: true,
-      });
+        }
+      );
     } catch (error) {
       handleError({
         error,
@@ -936,6 +1013,16 @@ const initCoinGame = ({
   startCoinGameBtn.addEventListener('click', () => {
     runCoinGame();
   });
+
+  const applyLanguage = () => {
+    setRunningState(isRunning);
+    if (!isRunning && coinStatus && coinStatus.textContent.trim().length === 0) {
+      setStatusMessage(coinStatus, getTranslation(currentLanguage, 'coinGameReadyStatus'));
+    }
+  };
+
+  applyLanguage();
+  return { applyLanguage };
 };
 
 const initBrakeLab = ({
@@ -1077,23 +1164,20 @@ const initCommandPalette = ({
   triggerEasterEgg,
 }) => {
   if (!commandInput || !commandOutput) {
-    return;
+    return { applyLanguage: () => {} };
   }
-
-  const helpText = [
-    'Available commands:',
-    '• help / --help / ? — show this message',
-    '• reset — reset all quests',
-    '• next — complete the next quest',
-    '• toggle — toggle the theme',
-    '• magicword — trigger a bonus event',
-  ].join('\n');
 
   const respond = (message) => {
     commandOutput.textContent = message;
   };
 
-  respond('Ready. Type "help" for commands.');
+  const applyLanguage = () => {
+    if (!commandOutput.textContent || commandOutput.textContent.trim().length === 0) {
+      respond(getTranslation(currentLanguage, 'commandReady'));
+    }
+  };
+
+  respond(getTranslation(currentLanguage, 'commandReady'));
 
   commandInput.addEventListener('keydown', (event) => {
     if (event.key !== 'Enter') {
@@ -1102,30 +1186,32 @@ const initCommandPalette = ({
 
     const command = commandInput.value.trim().toLowerCase();
     if (!command) {
-      respond('Enter a command. Type "help" for options.');
+      respond(getTranslation(currentLanguage, 'commandPrompt'));
       return;
     }
 
     if (['help', '--help', '?'].includes(command)) {
-      respond(helpText);
+      respond(getTranslation(currentLanguage, 'commandHelpText'));
     } else if (command === 'reset') {
       resetTasks();
-      respond('Quests reset. Ready for a new run.');
+      respond(getTranslation(currentLanguage, 'commandResetDone'));
     } else if (command === 'next') {
       validateNextTask();
-      respond('Next quest validated.');
+      respond(getTranslation(currentLanguage, 'commandNextDone'));
     } else if (command === 'toggle') {
       toggleTheme();
-      respond('Theme toggled.');
+      respond(getTranslation(currentLanguage, 'commandToggleDone'));
     } else if (command === 'magicword') {
       triggerEasterEgg();
-      respond('Mystery mode activated!');
+      respond(getTranslation(currentLanguage, 'commandMagicDone'));
     } else {
-      respond(`Unknown command: ${command}. Type "help" for options.`);
+      respond(formatTranslation(currentLanguage, 'commandUnknown', { command }));
     }
 
     commandInput.value = '';
   });
+
+  return { applyLanguage };
 };
 
 const initFileActions = (fileLog) => {
@@ -1177,33 +1263,42 @@ const initMemo = () => {
     notesArea.value = savedNotes || '';
   }
 
+  const renderMemo = () => {
+    if (!notesArea || !virtualFileContent) {
+      return;
+    }
+    const memoText = notesArea.value.trim();
+    if (!memoText) {
+      virtualFileContent.textContent = getTranslation(currentLanguage, 'memoEmpty');
+      return;
+    }
+    virtualFileContent.replaceChildren();
+    const title = document.createElement('p');
+    title.textContent = getTranslation(currentLanguage, 'memoTitle');
+    const body = document.createElement('p');
+    body.textContent = memoText;
+    virtualFileContent.append(title, body);
+  };
+
   if (saveNotesBtn && notesArea) {
     saveNotesBtn.addEventListener('click', () => {
       const success = writeStorageValue('virtualNotes', notesArea.value);
       setStatusMessage(
         appStatus,
         success
-          ? 'Mémo saved! You can open it in the Quick Memo Viewer.'
-          : 'Unable to save the memo. Check browser storage permissions.'
+          ? getTranslation(currentLanguage, 'memoSaved')
+          : getTranslation(currentLanguage, 'memoSaveError')
       );
     });
   }
 
   if (openMemoBtn && notesArea && virtualFileContent) {
     openMemoBtn.addEventListener('click', () => {
-      const memoText = notesArea.value.trim();
-      if (!memoText) {
-        virtualFileContent.textContent = 'No memo saved yet.';
-        return;
-      }
-      virtualFileContent.replaceChildren();
-      const title = document.createElement('p');
-      title.textContent = 'Your saved Mémo:';
-      const body = document.createElement('p');
-      body.textContent = memoText;
-      virtualFileContent.append(title, body);
+      renderMemo();
     });
   }
+
+  return { applyLanguage: renderMemo };
 };
 
 const initDraggableWindows = () => {
@@ -1477,22 +1572,7 @@ const initApp = async () => {
     whiteoutOverlay: brakeWhiteout,
   });
 
-  initLanguageToggle({
-    languageToggle,
-    languageLabel,
-    evDataGrid,
-    rallyList,
-    onLanguageChange: () => {
-      refreshAuthState();
-      brakeLab.applyLanguage();
-    },
-  });
-  initAiLoop(aiLoopElement, () => getAiMessages(currentLanguage));
-  if (themeToggleBtn) {
-    themeToggleBtn.addEventListener('click', toggleTheme);
-  }
-  initMathCalculator({ mathInput, calcBtn, mathResult });
-  initCoinGame({
+  const coinGame = initCoinGame({
     startCoinGameBtn,
     coinsInput,
     thresholdInput,
@@ -1501,7 +1581,7 @@ const initApp = async () => {
     coinStatus,
     coinError,
   });
-  initCommandPalette({
+  const commandPalette = initCommandPalette({
     commandInput,
     commandOutput,
     resetTasks,
@@ -1509,9 +1589,28 @@ const initApp = async () => {
     toggleTheme,
     triggerEasterEgg,
   });
+  const memo = initMemo();
+
+  initLanguageToggle({
+    languageToggle,
+    languageLabel,
+    evDataGrid,
+    rallyList,
+    onLanguageChange: () => {
+      refreshAuthState();
+      brakeLab.applyLanguage();
+      coinGame.applyLanguage();
+      commandPalette.applyLanguage();
+      memo.applyLanguage();
+    },
+  });
+  initAiLoop(aiLoopElement, () => getAiMessages(currentLanguage));
+  if (themeToggleBtn) {
+    themeToggleBtn.addEventListener('click', toggleTheme);
+  }
+  initMathCalculator({ mathInput, calcBtn, mathResult });
   initFileActions(fileLog);
   initFolders();
-  initMemo();
   initDraggableWindows();
   initModals();
   initExternalLinks();
@@ -1524,7 +1623,7 @@ const initApp = async () => {
     resetBtn.addEventListener('click', resetTasks);
   }
 
-  setStatusMessage(coinStatus, UI_CONSTANTS.coinGameReadyStatus);
+  setStatusMessage(coinStatus, getTranslation(currentLanguage, 'coinGameReadyStatus'));
 
   window.TokyoTCG = {
     resetQuests: resetTasks,
