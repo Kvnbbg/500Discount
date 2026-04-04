@@ -662,19 +662,19 @@ const initAuth = async ({
     const password = registerForm.querySelector('#registerPassword')?.value;
 
     if (!name || !email || !password || !isValidEmail(email)) {
-      applyAuthState(null, 'authRegisterInvalid');
+      applyAuthState(authStore.getSession(), 'authRegisterInvalid');
       return;
     }
 
     if (password.length < UI_CONSTANTS.authMinimumPasswordLength) {
-      applyAuthState(null, 'authRegisterWeakPassword');
+      applyAuthState(authStore.getSession(), 'authRegisterWeakPassword');
       return;
     }
 
     const response = await authStore.registerUser({ name, email, password });
     if (!response.ok) {
       const messageKey = response.reason === 'exists' ? 'authRegisterExists' : 'authRegisterInvalid';
-      applyAuthState(null, messageKey);
+      applyAuthState(authStore.getSession(), messageKey);
       return;
     }
 
@@ -688,13 +688,13 @@ const initAuth = async ({
     const password = loginForm.querySelector('#loginPassword')?.value;
 
     if (!email || !password || !isValidEmail(email)) {
-      applyAuthState(null, 'authLoginInvalid');
+      applyAuthState(authStore.getSession(), 'authLoginInvalid');
       return;
     }
 
     const response = await authStore.authenticateUser({ email, password });
     if (!response.ok) {
-      applyAuthState(null, 'authLoginInvalid');
+      applyAuthState(authStore.getSession(), 'authLoginInvalid');
       return;
     }
 
@@ -894,6 +894,12 @@ const initCoinGame = ({
   }
 
   let isRunning = false;
+  let statusMessageState = { key: 'coinGameReadyStatus', replacements: {} };
+
+  const setLocalizedCoinStatus = (key, replacements = {}) => {
+    statusMessageState = { key, replacements };
+    setStatusMessage(coinStatus, formatTranslation(currentLanguage, key, replacements));
+  };
 
   const setRunningState = (running) => {
     isRunning = running;
@@ -926,14 +932,13 @@ const initCoinGame = ({
     const coins = parsedCoins.coins;
 
     setRunningState(true);
-    setStatusMessage(
-      coinStatus,
-      parsedCoins.warning
-        ? formatTranslation(currentLanguage, 'coinGameCalculatingWarning', {
-            warning: parsedCoins.warning,
-          })
-        : getTranslation(currentLanguage, 'coinGameCalculating')
-    );
+    if (parsedCoins.warning) {
+      setLocalizedCoinStatus('coinGameCalculatingWarning', {
+        warning: parsedCoins.warning,
+      });
+    } else {
+      setLocalizedCoinStatus('coinGameCalculating');
+    }
     if (coinLog) {
       coinLog.replaceChildren();
     }
@@ -944,12 +949,7 @@ const initCoinGame = ({
       renderCoins(coinDisplay, workingCoins);
 
       if (result.steps.length === 0) {
-        setStatusMessage(
-          coinStatus,
-          result.success
-            ? getTranslation(currentLanguage, 'coinGameAllMeetThreshold')
-            : getTranslation(currentLanguage, 'coinGameNotEnough')
-        );
+        setLocalizedCoinStatus(result.success ? 'coinGameAllMeetThreshold' : 'coinGameNotEnough');
         appendCoinLogEntry(
           coinLog,
           formatTranslation(currentLanguage, 'coinGameMinOps', {
@@ -983,12 +983,7 @@ const initCoinGame = ({
         renderCoins(coinDisplay, workingCoins);
       }
 
-      setStatusMessage(
-        coinStatus,
-        result.success
-          ? getTranslation(currentLanguage, 'coinGameReached')
-          : getTranslation(currentLanguage, 'coinGameUnreachable')
-      );
+      setLocalizedCoinStatus(result.success ? 'coinGameReached' : 'coinGameUnreachable');
       appendCoinLogEntry(
         coinLog,
         formatTranslation(currentLanguage, 'coinGameMinOps', {
@@ -1016,9 +1011,13 @@ const initCoinGame = ({
 
   const applyLanguage = () => {
     setRunningState(isRunning);
-    if (!isRunning && coinStatus && coinStatus.textContent.trim().length === 0) {
-      setStatusMessage(coinStatus, getTranslation(currentLanguage, 'coinGameReadyStatus'));
+    if (isRunning) {
+      return;
     }
+    setStatusMessage(
+      coinStatus,
+      formatTranslation(currentLanguage, statusMessageState.key, statusMessageState.replacements)
+    );
   };
 
   applyLanguage();
@@ -1170,14 +1169,17 @@ const initCommandPalette = ({
   const respond = (message) => {
     commandOutput.textContent = message;
   };
-
-  const applyLanguage = () => {
-    if (!commandOutput.textContent || commandOutput.textContent.trim().length === 0) {
-      respond(getTranslation(currentLanguage, 'commandReady'));
-    }
+  let commandMessageState = { key: 'commandReady', replacements: {} };
+  const respondTranslated = (key, replacements = {}) => {
+    commandMessageState = { key, replacements };
+    respond(formatTranslation(currentLanguage, key, replacements));
   };
 
-  respond(getTranslation(currentLanguage, 'commandReady'));
+  const applyLanguage = () => {
+    respond(formatTranslation(currentLanguage, commandMessageState.key, commandMessageState.replacements));
+  };
+
+  respondTranslated('commandReady');
 
   commandInput.addEventListener('keydown', (event) => {
     if (event.key !== 'Enter') {
@@ -1186,26 +1188,26 @@ const initCommandPalette = ({
 
     const command = commandInput.value.trim().toLowerCase();
     if (!command) {
-      respond(getTranslation(currentLanguage, 'commandPrompt'));
+      respondTranslated('commandPrompt');
       return;
     }
 
     if (['help', '--help', '?'].includes(command)) {
-      respond(getTranslation(currentLanguage, 'commandHelpText'));
+      respondTranslated('commandHelpText');
     } else if (command === 'reset') {
       resetTasks();
-      respond(getTranslation(currentLanguage, 'commandResetDone'));
+      respondTranslated('commandResetDone');
     } else if (command === 'next') {
       validateNextTask();
-      respond(getTranslation(currentLanguage, 'commandNextDone'));
+      respondTranslated('commandNextDone');
     } else if (command === 'toggle') {
       toggleTheme();
-      respond(getTranslation(currentLanguage, 'commandToggleDone'));
+      respondTranslated('commandToggleDone');
     } else if (command === 'magicword') {
       triggerEasterEgg();
-      respond(getTranslation(currentLanguage, 'commandMagicDone'));
+      respondTranslated('commandMagicDone');
     } else {
-      respond(formatTranslation(currentLanguage, 'commandUnknown', { command }));
+      respondTranslated('commandUnknown', { command });
     }
 
     commandInput.value = '';
